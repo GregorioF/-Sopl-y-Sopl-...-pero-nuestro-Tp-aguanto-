@@ -1,5 +1,7 @@
 
 #include "../tp2.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 void smalltiles_c (unsigned char *src, unsigned char *dst, int cols, int filas, int src_row_size, int dst_row_size) {
 	//COMPLETAR
@@ -8,17 +10,37 @@ void smalltiles_c (unsigned char *src, unsigned char *dst, int cols, int filas, 
 	
 	// ejemplo de uso de src_matrix y dst_matrix (copia la imagen)
 
-	for (int f = 0; f < filas; f++) {
-		for (int c = 0; c < cols; c++) {
-			bgra_t *p_d = (bgra_t*) &dst_matrix[f][c * 4];
-            bgra_t *p_s = (bgra_t*) &src_matrix[f][c * 4];
+	int ancho = div(cols, 2).quot;
+	int largo = div(filas,2).quot;
 
-			p_d->b = p_s->b;
-			p_d->g = p_s->g;
-			p_d->r = p_s->r;
-			p_d->a = p_s->a;
+	for (int f = 0; f < largo; f++) {
+		for (int c = 0; c < ancho; c++) {
+
+			bgra_t *p_s = (bgra_t*) &src_matrix[2*f][c * 8];
+
+			for(int i = 0; i < 2; i++){
+				
+				bgra_t *p_d = (bgra_t*) &dst_matrix[f][(c  + ancho*i)*4];
+
+				p_d->b = p_s->b;
+				p_d->g = p_s->g;
+				p_d->r = p_s->r;
+				p_d->a = p_s->a;
+			}
+
+			for(int i = 0; i < 2; i++){
+				
+				bgra_t *p_d = (bgra_t*) &dst_matrix[f + largo][(c  + ancho*i)*4];
+
+				p_d->b = p_s->b;
+				p_d->g = p_s->g;
+				p_d->r = p_s->r;
+				p_d->a = p_s->a;
+			}
 
 		}
 	}
-	
+
 }
+
+	
