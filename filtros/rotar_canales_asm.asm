@@ -23,7 +23,7 @@ rotar_asm:
 		pslldq xmm3, 8
 		mov r8, 0x0704060503000201
 		movq xmm4, r8
-		pxor xmm3, xmm4	 	; termine de hacer la mascara para shufle si el pixel x era = a|b|g|r ahora con shufle
+		por xmm3, xmm4	 	; termine de hacer la mascara para shufle si el pixel x era = a|b|g|r ahora con shufle
 							; va a ser igual a  a|g|r|b
 		
 	.ciclo:
