@@ -25,10 +25,11 @@ smalltiles_asm:
 	mov rax, rdx
 	shl rax, 2 ; tengo el tamaño de fila en rax
 
-	mov r12, rcx
-	shr r12, 1
+	mov r12, rcx	; en r12 tengo la cantidad de filas que hay
+	shr r12, 1		; ahora la mitad
+	mov qword j, 0
 	.opAux:
-		add j, rax
+		add j, rax	; por cada fila le sumo a j 
 		sub r12, 1
 		cmp r12, 0
 		jne .opAux
@@ -61,9 +62,15 @@ smalltiles_asm:
 				movdqu [rsi+r10*4], xmm10			; escribo en  la segunda imagen
 
 
-			;	lea r10 , [r12+r11*4]
+				lea r10 , [r12+r11*4]
 
-			;	movdqu [rsi+r10], xmm10
+				movdqu [rsi+r10], xmm10
+				
+				mov r10, r11
+				add r10, i
+				
+				lea r10, [r12+ r10*4]
+				movdqu [rsi +r10], xmm10
 
 				add r8, 8
 				add r11, 4
