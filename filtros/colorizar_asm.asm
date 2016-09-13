@@ -25,16 +25,14 @@ section .text
 
 colorizar_asm:
 
-.HacerMascaras: ;copiado de Gregorio:
+.HacerMascaras: 
 		pxor xmm4, xmm4
-		mov r8, 0x0f0c0e0d0b080a09 	; hago la mascara para shuffle
 		
-		movq xmm5, r10
-		pslldq xmm5, 8
-		mov r10, 0x0704060503000201
+		;creo mascaras en xmm5 y xmm6 para q me queden : a|b|g|b y a|g|r|r
+
+		mov r10, 1
+		pxor xmm4, xmm4
 		movq xmm4, r10
-		por xmm5, xmm4	 	; termine de hacer la mascara para shuffle si el pixel x era = a|b|g|r ahora con shufle
-							; va a ser igual a  a|g|r|b
 
 
 .ciclo:
@@ -47,29 +45,17 @@ colorizar_asm:
 	pmaxsb xmm1, xmm3 ; guardo el max en xmm1 
 
 	movups xmm3, xmm1 ; copio
-	pshufb xmm3, xmm5 ; en xmm3 quedan los pixeles x dentro asi: a|g|r|b
 
-	pmaxsb xmm3, xmm1 ; en el byte 1 y en el 0 de cada pixel tengo max(R,G) y max(R,B) respectivamente. y max(G,B) en el byte 2
+	pshufb xmm3, xmm5 ; en xmm3 quedan los pixeles x dentro asi: a|g|r|r
 
-	pcmpeqb xmm3, xmm1 ; comparo para obtener phi
+	pshufb xmm1, xmm6 ;: en xmm1 quedan los pixeles x dentro asi: a|b|g|b
 
+	pcmpgtb xmm1, xmm3 ; comparo para obtener phi 
 	
-
-
-
-
-
-
-
-
-
-	
-
-
-
-
-
-
+	;en el byte 3 de cada pixel: 0
+	;en el byte 2 de cada pixel : b > g
+	; en el byte 1 de cada pixel : g > r
+	;en el  byte 0 de cada pixel : b > r
 
 
 
