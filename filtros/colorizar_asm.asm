@@ -39,7 +39,7 @@ colorizar_asm:
 
 	movups xmm1, [rdi + rdx]; en xmm1 guardo los 3 pixeles de arriba
 	movups xmm2, [rdi]; en xmm2 guardo los 3 pixeles ppales (el pixel 1 y el 2 son los q estoy calculando)
-	movups xmm3, [rdi - rdx]; en xmm3 guardo los 3 pixeles de abajo
+;	movups xmm3, [rdi - rdx]; en xmm3 guardo los 3 pixeles de abajo
 
 	pmaxsb xmm1, xmm2 ; guardo el maximo de cada byte en xmm1
 	pmaxsb xmm1, xmm3 ; guardo el max en xmm1 

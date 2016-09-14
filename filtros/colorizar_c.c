@@ -53,8 +53,24 @@ void colorizar_c (
             bgra_t *p2_s = (bgra_t*) &src_matrix[f][c * 4];
             bgra_t *p3_s = (bgra_t*) &src_matrix[f+1][c * 4];
 
-            unsigned char res[3];
-            maximos( p1_s, p2_s, p3_s, res);
+            //unsigned char res[3];
+            //maximos( p1_s, p2_s, p3_s, res);
+            
+            
+            unsigned char res[3] = {0,0,0}; 
+            for(int ff=-1;ff<=1;ff++) {
+               for(int cc=-1;cc<=1;cc++) {
+				   if( res[0] < ((bgra_t*)&src_matrix[f+ff][c*4+cc*4])->b ) {
+					   res[0] = ((bgra_t*)&src_matrix[f+ff][c*4+cc*4])->b;
+				   }
+				   if( res[1] < ((bgra_t*)&src_matrix[f+ff][c*4+cc*4])->g ) {
+					   res[1] = ((bgra_t*)&src_matrix[f+ff][c*4+cc*4])->g;
+				   }
+				   if( res[2] < ((bgra_t*)&src_matrix[f+ff][c*4+cc*4])->r ) {
+					   res[2] = ((bgra_t*)&src_matrix[f+ff][c*4+cc*4])->r;
+				   }
+			   }
+		   }
 
             bgra_t *p_d = (bgra_t*) &dst_matrix[f][c * 4];
             
