@@ -90,8 +90,8 @@ typedef struct filtro_t {
 // ~~~ declaraciones de tp2 ~~~
 extern filtro_t filtros[];
 filtro_t* detectar_filtro(configuracion_t *config);
-void      correr_filtro_imagen(configuracion_t *config, aplicador_fn_t aplicador);
-void      imprimir_tiempos_ejecucion(unsigned long long int start, unsigned long long int end, int cant_iteraciones);
+void      correr_filtro_imagen(configuracion_t *config, aplicador_fn_t aplicador, unsigned long long int* total);
+void      imprimir_tiempos_ejecucion(unsigned long long int start, unsigned long long int end, int cant_iteraciones,  unsigned long long int* total);
 
 // ~~~ declaraciones de cli.h ~~~
 void      procesar_opciones(int argc, char **argv, configuracion_t *config);

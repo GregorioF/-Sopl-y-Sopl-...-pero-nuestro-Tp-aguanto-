@@ -50,12 +50,19 @@ int main( int argc, char** argv ) {
 		printf ( "  Archivo de entrada : %s\n", config.archivo_entrada);
 	}
 
+
 	filtro_t *filtro = detectar_filtro(&config);
+
+	unsigned long long int total=0;
 
 	if (filtro != NULL) {
 		filtro->leer_params(&config, argc, argv);
-		correr_filtro_imagen(&config, filtro->aplicador);
+		//for (int i= 0 ; i < 100 ;i ++)
+		correr_filtro_imagen(&config, filtro->aplicador, &total);
 	}
+	
+	total = total/100;
+//	printf("el total promedio es : %llu\n",total );
 
 	return 0;
 }
@@ -76,7 +83,7 @@ filtro_t* detectar_filtro(configuracion_t *config)
 }
 
 
-void imprimir_tiempos_ejecucion(unsigned long long int start, unsigned long long int end, int cant_iteraciones) {
+void imprimir_tiempos_ejecucion(unsigned long long int start, unsigned long long int end, int cant_iteraciones, unsigned long long int* total) {
 	unsigned long long int cant_ciclos = end-start;
 
 	printf("Tiempo de ejecución:\n");
@@ -85,9 +92,10 @@ void imprimir_tiempos_ejecucion(unsigned long long int start, unsigned long long
 	printf("  # iteraciones                     : %d\n", cant_iteraciones);
 	printf("  # de ciclos insumidos totales     : %llu\n", cant_ciclos);
 	printf("  # de ciclos insumidos por llamada : %.3f\n", (float)cant_ciclos/(float)cant_iteraciones);
+	*total = *total + cant_ciclos;
 }
 
-void correr_filtro_imagen(configuracion_t *config, aplicador_fn_t aplicador)
+void correr_filtro_imagen(configuracion_t *config, aplicador_fn_t aplicador, unsigned long long int* total)
 {
 	snprintf(config->archivo_salida, sizeof  (config->archivo_salida), "%s/%s.%s.%s%s.bmp",
              config->carpeta_salida, basename(config->archivo_entrada),
@@ -108,6 +116,6 @@ void correr_filtro_imagen(configuracion_t *config, aplicador_fn_t aplicador)
 		MEDIR_TIEMPO_STOP(end)
 		imagenes_guardar(config);
 		imagenes_liberar(config);
-		imprimir_tiempos_ejecucion(start, end, config->cant_iteraciones);
+		imprimir_tiempos_ejecucion(start, end, config->cant_iteraciones, total);
 	}
 }
