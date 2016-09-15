@@ -51,37 +51,40 @@ pixelar_asm:
 			paddsw xmm3, xmm6 	  		; en la parte alta de xmm3 me qda la sumatoria de los cuatro pixeles.
 
 	    psrlw xmm3, 2						; divido cada valor por cuatro
+
+
+			;; Esta operacion es para duplicar el valor de la parte alta en la parte baja
+			;; para cuando los empaquete que me qde como deseo
 			psrldq xmm3, 8
 			movdqu xmm11, xmm3
 			pslldq xmm3, 8
 			paddsw xmm3, xmm11
 		;===================================================
 
-			movdqu xmm5, xmm0					; pongo los valores de la priemr linea en xmm5
-			punpcklbw xmm5, xmm10			; extiendo los valores de la parte baja
-			movdqu xmm4, xmm1					; pongo los valores de la segunda linea en xmm4
-			punpcklbw xmm4, xmm10			; extiendo los valores de la parte baja
-			paddsw xmm5, xmm4					; en xmm5 tengo la sumatoria de los pixeles de la primer linea con su respectivo de la segunda linea
+			punpcklbw xmm0, xmm10			; extiendo los valores de la parte baja
+			;movdqu xmm4, xmm1					; pongo los valores de la segunda linea en xmm4
+			punpcklbw xmm1, xmm10			; extiendo los valores de la parte baja
+			paddsw xmm0, xmm1					; en xmm0 tengo la sumatoria de los pixeles de la primer linea con su respectivo de la segunda linea
 
-			movdqu xmm6, xmm5
+			movdqu xmm6, xmm0
 			psrldq xmm6, 8
-			paddsw xmm5, xmm6
+			paddsw xmm0, xmm6			; en la parte baja de xmm0, me qda la sumatoria de los cuatro pixeles inferiores
 
 
-	    psrlw xmm5, 2						; divido cada valor por cuatro
-			pslldq xmm5, 8
-			movdqu xmm11, xmm5
-			psrldq xmm5, 8
-			paddsw xmm5, xmm11
+	    psrlw xmm0, 2						; divido cada valor por cuatro
+			pslldq xmm0, 8
+			movdqu xmm11, xmm0
+			psrldq xmm0, 8
+			paddsw xmm0, xmm11
 		;===================================================
 
-			packuswb xmm5, xmm3 		; en xmm5 tengo el resultado final
+			packuswb xmm0, xmm3 		; en xmm0 tengo el resultado final
 
 			mov r10, r9
 			shl r10, 2							; multiplico r10 porq el tamaño de los bgra
-			movdqu [rsi+r10], xmm5
+			movdqu [rsi+r10], xmm0
 			add r10, r8
-			movdqu [rsi+r10], xmm5
+			movdqu [rsi+r10], xmm0
 
 			; =====================   actualizo currents
 			add r9, 4							; avanzo cuatro columnas
