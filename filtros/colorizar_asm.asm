@@ -33,7 +33,7 @@ colorizar_asm:
 	subps xmm7, xmm9 ; guardo 1-alpha en xmm7
 
 .HacerMascaras: 
-		;pxor xmm4, xmm4	;								a|r|g|b
+		pxor xmm4, xmm4	;								a|r|g|b
 		
 		;creo mascaras en xmm5 y xmm6 para q me queden : a|b|g|b y a|g|r|r
 
@@ -86,18 +86,8 @@ colorizar_asm:
 	movups xmm1, xmm2
 
 
-	pshufb xmm2, xmm6 ; en xmm2 quedan los pixeles x dentro asi: a|g|r|r
-
-	pshufb xmm1, xmm5 ;: en xmm1 quedan los pixeles x dentro asi: a|b|g|b
-
-	pcmpgtb xmm1, xmm2 ; comparo para obtener phi 
 	
-	;en el byte 3 de cada pixel: 0
-	;en el byte 2 de cada pixel : b > g
-	; en el byte 1 de cada pixel : g > r
-	;en el  byte 0 de cada pixel : b > r
 
-	 
 
 	ret
 
