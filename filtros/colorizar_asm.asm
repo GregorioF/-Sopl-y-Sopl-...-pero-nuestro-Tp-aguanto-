@@ -20,6 +20,8 @@
 
 global colorizar_asm
 
+section .data
+MenosUnosEnDobleW: db 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
 
 section .text
 
@@ -73,7 +75,7 @@ colorizar_asm:
 
 	pmaxsb xmm2, xmm1 ; me queda en el pixel 0 max(pixel ppal y su columna de la derecha)
 
-	pmaxsb xmm2, xmm3 ; me queda en el pixel 0 los maximos entre los pixeles 2,1,0
+	pmaxsb xmm2, xmm3 ; me queda en el pixel 0 los maximos entre los pixeles 2,1,0													
 
 	movups xmm1, xmm3
 	psrldq xmm1, 4
@@ -90,4 +92,28 @@ colorizar_asm:
 
 
 	ret
+	
+	
+; pasarle un registro con floats sino no funca naAaaaaa!
+pasarDeMenosUnoAUnoYDeCeroAMenosUno:
+; en xmm0 me viene el registro a cambiar de a dobles words son
+
+pxor xmm14, xmm14 ; foward clean
+
+movdqu xmm15, [MenosUnosEnDobleW]	; les meto toddas F
+cvtdq2ps xmm15, xmm15		; los convierto en floats
+
+mulps xmm0, xmm15		; multiplico todos los valores por menos uno, asi que lo que era -1 ahora es 1 y lo que es cero sigue siendo cero
+
+movups xmm13, xmm0
+
+cmpps xmm13, xmm14, 0		; en donde habia ceros ahora hay menos unos y donde habia unos quedan ceros
+
+addps xmm0, xmm13 			; ahora en xmm0 me qda donde habia ceros en un principio menos unos  y donde habia efes en un princio unos
+ret
+
+
+
+
+
 
