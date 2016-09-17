@@ -23,6 +23,7 @@ extern combinar_c
 
 section .rodata
 		mascara255: dd 255.0, 255.0, 255.0, 255.0
+		menos1: dd -1.0, -1.0, -1.0, -1.0
 
 section .text
 
@@ -34,6 +35,7 @@ combinar_asm:
 	xor r10, r10 ; pongo un 0 en mi contador de filas
 	xor r9, r9 ; pongo un 0 en mi contador de columnas
 	xor r11, r11
+	xor r14, r14
 	pshufd xmm0, xmm0, 00000000b ; El alpha era un float que sólo estaba en los "primeros" (últimos) 4 bytes de xmm0, entonces no iba a multiplicar bien.
 																; Paso el alpha a los otros lugares: xmm0 == | alpha | alpha | alpha | alpha |
 	movdqu xmm14, [mascara255] ; paso a un registro lo de la máscara fuera de los ciclos porque como es un acceso a memoria quiero minimizar la cantidad de veces que se hace.
@@ -43,6 +45,7 @@ combinar_asm:
 		cmp r10, rcx ; comparo r8 con la cantidad de filas
 		je .fin ; si es igual ya terminó de recorrer la matriz y salto al final
 		mov r9, 0 ; si no, pongo un 0 en el contador de columnas y voy al ciclo Interno
+		mov r14, r9
 		mov r11, rdi ; r11 == rdi
 		add r11, r8 ; r11 == rdi + tamaño de la fila
 		sub r11, 16 ; r11 == rdi + tamaño de la fila - 16
@@ -53,7 +56,7 @@ combinar_asm:
 			.cicloInterno:
 					movdqu xmm1, [rdi + 4*r9] ; agarro 4 píxeles de la mitad izquierda de la foto
 					movdqu xmm2, xmm1
-					movdqu xmm3, [r11 - 4*r9] ; agarro 4 píxeles de la mitad derecha de la foto
+					movdqu xmm3, [r11 + 4*r14] ; agarro 4 píxeles de la mitad derecha de la foto
 					movdqu xmm4, xmm3
 					punpcklbw xmm1, xmm9 ; | 0 | píxel 1 a | 0 | píxel 1 r | 0 | píxel 1 g | 0 | píxel 1 b | 0 | píxel 0 a | 0 | píxel 0 r | 0 | píxel 0 g | 0 | píxel 0 b |
 					punpckhbw xmm2, xmm9 ; | 0 | píxel 3 a | 0 | píxel 3 r | 0 | píxel 3 g | 0 | píxel 3 b | 0 | píxel 2 a | 0 | píxel 2 r | 0 | píxel 2 g | 0 | píxel 2 b |
@@ -98,22 +101,27 @@ combinar_asm:
 					mulps xmm12, xmm0
 					mulps xmm13, xmm0
 
-					movdqu xmm15, xmm1 ; Muevo xmm1 a otro registro porque en xmm1 se hace la división
+				;	movdqu xmm15, xmm1 ; Muevo xmm1 a otro registro porque en xmm1 se hace la división
 
-					movdqu xmm1, xmm10
-					divps xmm14 ; Hago la división con xmm1
-					movdqu xmm10, xmm1 ; Pongo el resultado donde lo quiero
-					movdqu xmm1, xmm11 ; tengo que mover a xmm1 para poder hacer la división de lo que hay en xmm11
-					divps xmm14
-					movdqu xmm11, xmm1
-					movdqu xmm1, xmm12
-					divps xmm14
-					movdqu xmm12, xmm1
-					movdqu xmm1, xmm13
-					divps xmm14
-					movdqu xmm13, xmm1
+				;	movdqu xmm1, xmm10
+				;	divps xmm14 ; Hago la división con xmm1
+				;	movdqu xmm10, xmm1 ; Pongo el resultado donde lo quiero
+				;	movdqu xmm1, xmm11 ; tengo que mover a xmm1 para poder hacer la división de lo que hay en xmm11
+				;	divps xmm14
+				;	movdqu xmm11, xmm1
+				;	movdqu xmm1, xmm12
+				;	divps xmm14
+				;	movdqu xmm12, xmm1
+				;	movdqu xmm1, xmm13
+				;	divps xmm14
+				;	movdqu xmm13, xmm1
 
-					movdqu xmm1, xmm15 ; Reestablezco xmm1
+				;	movdqu xmm1, xmm15 ; Reestablezco xmm1
+
+				divps xmm10, xmm14
+				divps xmm11, xmm14
+				divps xmm12, xmm14
+				divps xmm13, xmm14
 
 ; ============ Sumo el píxel de la parte espejada ==============
 					addps xmm10, xmm8 ; sumo el píxel de la parte espejada
@@ -140,10 +148,10 @@ combinar_asm:
 					movups [rsi + 4*r9], xmm13
 
 ; =============== PARA LA PARTE DERECHA =========================
-					mulps xmm15, -1 ; uso lo ya multiplicado por alpha y dividido por 255 y lo multiplico por -1.
-					mulps xmm8, -1
-					mulps xmm4, -1
-					mulps xmm7, -1
+					mulps xmm15, [menos1] ; uso lo ya multiplicado por alpha y dividido por 255 y lo multiplico por -1.
+					mulps xmm8, [menos1]
+					mulps xmm4, [menos1]
+					mulps xmm7, [menos1]
 
 ; =============== Convierto a precisión simple los que voy a sumar ======
 					cvtdq2ps xmm1, xmm1
@@ -163,9 +171,11 @@ combinar_asm:
 					packuswb xmm7, xmm8 ; empaqueto de w a b, xmm7 == pixel 0, pixel 1, pixel 2, pixel 3
 
 ; ============ Pongo en la imagen destino en la mitad derecha de la imagen =======================
-					movups [r12 - 4*r9], xmm7
+					movups [r12 + 4*r14], xmm7
 
 					add r9, 4 ; como cada vez se procesan 4 píxeles de la imagen destino, se avanzan 4 columnas
+					mov r14, r9
+					imul r14, -1
 					cmp r9, rdx ; comparo r9 con la cantidad de columnas
 					jne .cicloInterno ; si no es igual falta procesar píxeles en esa fila
 
