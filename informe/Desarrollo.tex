@@ -11,6 +11,8 @@ El codigo en C consiste en implementar dos for que nos permitan recorrer toda la
 \subsubsection{Codigo ASM} 
 El codigo en ASM se intenta implementar una idea parecida al implmentado en C, pero en este se intenta explotar lo maximo posible el conjunto de instrucciones SSE de procesamiento simultaneo. Aca para recorrer, se utiliza la misma idea de un ciclo principial que recorra las filas, y uno interior a este que recorra las columnas de cada fila. En el codigo utilizamos los registros xmm de 128 bits,  que al hacer una lectura de memoria leerian 4 pixeles, y como mencionamos anteriormente nuestra idea se basaba en solo tener en cuenta uno de cada dos pixeles, por lo que dos de esos 4 pixeles no son de nuestra utilidad, asi que para poder aprovechar el tamaño de los estos registros hacemos dos lecturas por iteracion con dos registros diferentes, unimos los pixeles utiles en un solo registro, y los imprimimos debidamente en cada sub imagen, esto siempre por cada iteracion del sub ciclo.
 
+\subsubsection{Experimento}
+Ver diferencia con usar o no usar conjunto de insrtucciones SSE en asm. (Como influye la cantidad de lecturas a memoria)
 
 \subsection{Rotar}
 \subsubsection{Descripcion}
@@ -26,3 +28,9 @@ El codigo C simplemente consiste en dos ciclos for acoplados, uno para columnas 
 
 \subsubsection{Codgio ASM}
 En el codigo asm la idea es similar a la implementada en C, de dos ciclos combinados para recorrer toda la image,  solo que aca utilizamos los registros xmm para levantar 4 pixeles por cada iteracion, una instruccion del conjunto de instruciciones SSE, para hacer la rotacion conjunta de los 4 pixeles, e imprimimos directamente por cada iteracion los 4 pixeles en la imagen Dest.
+
+\subsubsection{Experimento}
+Romper caché
+
+
+

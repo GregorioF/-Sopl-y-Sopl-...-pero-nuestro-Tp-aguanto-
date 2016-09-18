@@ -22,6 +22,7 @@ global colorizar_asm
 
 section .data
 MenosUnosEnDobleW: db 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
+mascaraPrueba: db 0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00
 
 section .text
 
@@ -57,7 +58,9 @@ colorizar_asm:
 
 
 .ciclo:
-
+	movdqu xmm0, [mascaraPrueba] 
+	call pasarDeMenosUnoAUnoYDeCeroAMenosUno
+	
 	movups xmm1, [rdi + rdx + rdx]; en xmm1 guardo los 3 pixeles de arriba
 	movups xmm2, [rdi + rdx]; en xmm2 guardo los 3 pixeles ppales (el pixel 1 y el 2 son los q estoy calculando)
 	movups xmm3, [rdi]; en xmm3 guardo los 3 pixeles de abajo
@@ -102,6 +105,8 @@ pxor xmm14, xmm14 ; foward clean
 
 movdqu xmm15, [MenosUnosEnDobleW]	; les meto toddas F
 cvtdq2ps xmm15, xmm15		; los convierto en floats
+
+
 
 mulps xmm0, xmm15		; multiplico todos los valores por menos uno, asi que lo que era -1 ahora es 1 y lo que es cero sigue siendo cero
 
