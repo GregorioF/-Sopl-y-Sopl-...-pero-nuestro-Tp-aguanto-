@@ -37,24 +37,31 @@ mul rcx
 mov rdx, r12
 xor r12,r12
 
-.HacerMascaras: 
-		pxor xmm4, xmm4	;								a|r|g|b
+	;.HacerMascaras: 
+	pxor xmm4, xmm4	;								a|r|g|b
 		
-		;creo mascaras en xmm5 me quede : b|b|b|b
+	;creo mascaras en xmm5 me quede : b|b|b|b
 
-		mov r10, 0x0f0e0d0c0b0a0908 	; hago la mascara para shuffle
+	mov r10, 0x0f0e0d0c0b0a0908 	; hago la mascara para shuffle
 
-		movq xmm5, r10
+	movq xmm5, r10
 
-		pslldq xmm5, 8 ;shifteo a izquierda 8 bytes
+	pslldq xmm5, 8 ;shifteo a izquierda 8 bytes
 
-		mov r10, 0x0404040400000000
+	mov r10, 0x0404040400000000
 
-		movq xmm4, r10
+	movq xmm4, r10
 
-		por xmm5,xmm4 ; tengo la mascara en xmm5
+	por xmm5,xmm4 ; tengo la mascara en xmm5
 		
+	lea rdi, [rdi + rdx]
+	lea rdi, [rdi + 1] ; empiezo desde la fila 1 columna 1
 
+	add r12, rdx
+	inc r12
+
+	sub rax, rdx ; le resto al total de pixeles la fila tope
+	dec rax
 
 
 .ciclo:
@@ -153,7 +160,7 @@ xor r12,r12
 
 	packsswb xmm8, xmm8 ; quedan pixel1|pixel0|pixel1|pixel0
 
-	movq [rdi + 4], xmm8
+	movq [rsi + 4], xmm8
 
 	lea rdi, [rdi + 16]
 
