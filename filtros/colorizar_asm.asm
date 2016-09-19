@@ -23,162 +23,182 @@ global colorizar_asm
 section .data
 MenosUnosEnDobleW: db 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
 mascaraPrueba: db 0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00
+mascaraMaximos: db 0x00, 0x00, 0x00, 0x00, 0x04, 0x04, 0x04, 0x04, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
+mascaraUnos: db 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00
+mascaraUltraAux: db 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00
 
 section .text
 
 colorizar_asm:
+	push r12
+	sub rsp, 8
 
-movups xmm6, xmm0
-xor rax, rax
-inc rax
-mov r12, rdx
-mul r12
-mul rcx
-mov rdx, r12
-xor r12,r12
-
-	;.HacerMascaras: 
-	pxor xmm4, xmm4	;								a|r|g|b
+	movups xmm6, xmm0
+	movdqu xmm5, [mascaraMaximos]
+	
+	xor r9, r9  ; mi current sobre filas
+	add r9, 1 ; para no contemplar la primer fila
+	xor r10, r10 ; mi current sobre columnas
+	sub rcx, 2 ; para no contemplar las dos filas que no proceso
+	sub rdx, 2 ; misma situacion
+	.ciclo1:
 		
-	;creo mascaras en xmm5 me quede : b|b|b|b
-
-	mov r10, 0x0f0e0d0c0b0a0908 	; hago la mascara para shuffle
-
-	movq xmm5, r10
-
-	pslldq xmm5, 8 ;shifteo a izquierda 8 bytes
-
-	mov r10, 0x0404040400000000
-
-	movq xmm4, r10
-
-	por xmm5,xmm4 ; tengo la mascara en xmm5
+		xor r10, r10
+		cmp r9, rcx ; si son iguales termine de recorrer
+		je .fin
 		
-	lea rdi, [rdi + rdx]
-	lea rdi, [rdi + 1] ; empiezo desde la fila 1 columna 1
+		.ciclo2:
+			;==== cuenta auxliar para direccionamiento correcto
+			lea r11, [r10*4] ; mi current en columnas
+			add r11, r8
+			add r11, r8		; sumo dos veces para obtener la ultima fila dela q me interesa sacar datos
+			;====
+			movups xmm1, [rdi + r11]	; xmm1 == p3|p2|p1|p0     
+			
+			;=== cuenta auxiliar para direccionamiento correcto
+			lea r11, [r10*4]
+			add r11, r8
+			;===			
+			
+			movups xmm7, [rdi + r11]	; xmm2 == p7|p6|p5|p4    			
+			movups xmm2, xmm7			; salvo estos en xmm2
+			movups xmm13, xmm7
+			
+			;===
+			movups xmm3, [rdi+r10*4]	; xmm3 == p11|p10|p9|p8      
+			;=== listo levante tdoso los datos q qria
+			
+			
+			pmaxub xmm1, xmm2 ; guardo el maximo de cada byte en xmm1 
+			pmaxub xmm1, xmm3 ; guardo el max en xmm1 ==  pMax {3,7,11} | pmax{2,6,10}| pmax {1,5,9}| pmax {0,4,8}
 
-	add r12, rdx
-	inc r12
+			movups xmm3, xmm1 ; copio
+			movups xmm2, xmm1
 
-	sub rax, rdx ; le resto al total de pixeles la fila tope
-	dec rax
+			psrldq xmm3, 8 ;   xmm3 == 0 | 0 | pmax1 {3,7,11} | pmax 2 {2,6,10}
+			psrldq xmm1, 4 ;   xmm1 == 0 | fruta | pmax 2 {2,6,10} | pmax3 {1,5,9}
+
+			pmaxub xmm3, xmm1 ; xmm3 == 0 | fruit | pmax {3,7,11,2,6,10} | pmax {2,6,10,1,5,9}
+
+			pmaxub xmm2, xmm1 ; xmm2 == fruit | fruit | pmax {1,5,9,2,6,10} | pmax {0,4,8,1,5,9}
+
+			pmaxub xmm2, xmm3 ; xmm2 == fruit | fruit | MaxP2 | MaxP1
+
+			
+			movups xmm1, xmm2 ; xmm1 == fruta | furta | maxP2 | MaxP1
 
 
-.ciclo:
+			;========== seccion para calcular el maximo de los maximos en xmm1
+			
+			psrldq xmm1, 1 ; shifteo 1 byte, me queda 0|a|max(r)|max(g)|max(b)|a|max(r)|max(g)
 
-	inc r12
-	inc r12
+			pmaxsb xmm1,xmm2 ; me quedan a|max(a,r)|max(r,g)|max(g,b)|max(b,a)|max(a,r)|max(r,g)|max(g,b)
 
-	;movdqu xmm0, [mascaraPrueba] 
-	;call pasarDeMenosUnoAUnoYDeCeroAMenosUno
+			psrldq xmm1,1 ;  shifteo 1 byte, me queda 0|a|max(a,r)|max(r,g)|max(g,b)|max(b,a)|max(a,r)|max(r,g)
+
+			pmaxsb xmm1, xmm2 ; xmm1 =  0 | 0 | (fruta*3, maxP2 (g,b,r)) | (fruta*3, maxP1 (g,b,r))  
+
+			pshufb xmm1, xmm5 ; en xmm1 fruta | fruta | [maxP2(g,b,r) * 4] | [maxP1(g,b,r) * 4] 
+
+			pcmpeqb xmm1, xmm2 ; comparo el mayor de todos con los  maximos de cada canal en pixel 1 y 2
+			
+			;====== termino secccion en xmm1 me qda -1 en el byte de posicion igual al canal q tiene al maximo
+			;====== xmm1== fruta | fruta | InfoCopada2 | InfoCopada1
+			
+
+			punpcklbw xmm1, xmm1  ; xmm1 == InfoCopada2High| I.C.2.L | I.C.1.H | I.C.1.L|
+				
+			movups xmm2, xmm1	
+
+			punpcklwd xmm2, xmm1 ;  en cada dw me qda info copada sobre cada canala respectivamente del Pixel 1
+
+			punpckhwd xmm1, xmm1 ; en cada dw me qda info copada sobre cada canal respectivamente del Pixel 2
+
+			movups xmm0, xmm1
+			
+			cvtdq2ps xmm0, xmm0
+			
+			call pasarDeMenosUnoAUnoYDeCeroAMenosUno
+
+			movups xmm1, xmm0	; lo mismo q antes tengo en xmm1 pero ahora en float y bueno lo q hizo la op....
+						
+			movups xmm0, xmm2
+			
+			cvtdq2ps xmm0, xmm0
+
+			call pasarDeMenosUnoAUnoYDeCeroAMenosUno ; hace lo q hace dice pero me devuelve xmm0 en enteros
+			
+			cvtdq2ps xmm1, xmm1
+			cvtdq2ps xmm0, xmm0
+			
+			movups xmm5, xmm6	 	; le pongo en xmm5 el registro con los alphas
+
+			mulps xmm6, xmm1 		; le multiplico al alfa  por uno si esta en la posicion de pixel maximo
+									; o un -1 en caso contrario ACA QUEDAN LOS ALFAS DLEP IXEL 2
+									
+			mulps xmm5, xmm0		; ACA QUEDAN LOS ALFAS DEL PIXEL 1
+
+			movdqu xmm10, [mascaraUnos]
+			cvtdq2ps xmm10, xmm10
+			
+			addps xmm5, xmm10
+			addps xmm6, xmm10 ; aca me qda po lo que tengo q multiplicar a los pixeles iniciales para el resultado final
+			
+			
+			
+			pxor xmm0, xmm0
+			
+			movups xmm9, xmm7		; xmm9 == p7|p6|p5|p4
+			
+			punpcklbw xmm7, xmm0  ; xmm7 == p5 | p4
+			
+			movups xmm8, xmm7	 ;xmm8 == p5|p4
+
+			punpckhwd xmm8, xmm0 ; xmm8 == p5a | p5r | p5g |p5b
+			
+			punpckhbw xmm9, xmm0  ; xmm9 == p7 | p6
+			
+			movups xmm7, xmm9  ; xmm7 == p7 | p6
+			
+			punpcklwd xmm7, xmm0	; xmm7 == p6a | p6r | p6g |p6b
+			
+			cvtdq2ps xmm8, xmm8
+			cvtdq2ps xmm7, xmm7		; PASO AMBOS A FLOAT PARA PODER MULTIPLICAR POR EL VALOR DE CADA ALPHA
+
+			mulps xmm7, xmm6
+			mulps xmm8, xmm5
+			
+			cvtps2dq xmm8, xmm8
+			cvtps2dq xmm7, xmm7
+
+			packssdw xmm8, xmm7 ; quyedan pixel1|pixel0
+
+			packsswb xmm8, xmm8 ; quedan pixel1|pixel0|pixel1|pixel0
+			
+			movq [rsi + r10*4], xmm8
+			
+
+			add r10, 2
+			cmp r10, rdx
+			jne .ciclo2
+		
+		add r9, 1 
+		
+		jmp .ciclo1
+
+	.fin:
+		add rsp, 8 
+		pop r12
+		ret
 	
-	movups xmm1, [rdi + rdx + rdx]; en xmm1 guardo los 3 pixeles de arriba
-	movups xmm7, [rdi + rdx]; en xmm2 guardo los 3 pixeles ppales (el pixel 1 y el 2 son los q estoy calculando)
-	movups xmm2, xmm7
-	movups xmm3, [rdi]; en xmm3 guardo los 3 pixeles de abajo
-
-	pmaxsb xmm1, xmm2 ; guardo el maximo de cada byte en xmm1
-	pmaxsb xmm1, xmm3 ; guardo el max en xmm1 
-
-	movups xmm3, xmm1 ; copio
-	movups xmm2, xmm1
-
-	psrldq xmm3, 8 ; me queda en los 4 bytes 0 uno de los dos pixeles ppales
-	psrldq xmm1, 4 ; me queda en los 4 bytes 0 uno de los dos pixeles ppales
-
-	pmaxsb xmm3, xmm1 ; me queda en el pixel 0 max(pixeles ppales) y en el pixel 1 max(pixel ppal y columna de la izquierda)
-
-	pmaxsb xmm2, xmm1 ; me queda en el pixel 0 max(pixel ppal y su columna de la derecha)
-
-	pmaxsb xmm2, xmm3 ; me queda en el pixel 0 los maximos entre los pixeles 2,1,0													
-
-	movups xmm1, xmm3
-	psrldq xmm1, 4
-
-	pmaxsb xmm1, xmm3 ; me queda en el pixel 0 los maximos entre los pixeles 3,2,1
-
-	pslldq xmm1, 4
-	por xmm1, xmm2 ; me queda pixel 1 max entre 3,2,1 y pixel 2 max entre 2,1,0
-
-	movups xmm1, xmm2
-
-	psrldq xmm1, 1 ; shifteo 1 byte, me queda 0|a|max(r)|max(g)|max(b)|a|max(r)|max(g)
-
-	pmaxsb xmm1,xmm2 ; me quedan a|max(a,r)|max(r,g)|max(g,b)|max(b,a)|max(a,r)|max(r,g)|max(g,b)
-
-	movups xmm2,xmm1
-
-	psrldq xmm1,1 ;  shifteo 1 byte, me queda 0|a|max(a,r)|max(r,g)|max(g,b)|max(b,a)|max(a,r)|max(r,g)
-
-	pmaxsb xmm1, xmm2 ; me quedan a|max1(a,r)|max1(a,r,g)|max1(r,g,b)|max0(a,g,b)|max0(a,r,b)|max0(a,r,g)|max0(r,g,b)
-
-	pshufb xmm1, xmm5 ; en xmm1 me quedan basura|max1(rgb)|max1(rgb)|max1(rgb)|max1(rgb)||max0(rgb)|max0(rgb)|max0(rgb)|max0(rgb)
-
-	movups xmm2, xmm7
-
-	psrldq xmm2, 4 ; shifteo 4 bytes a la derecha
-
-	pcmpeqb xmm1, xmm2 ; comparo el mayor de todos con a|r|g|b original
-
-	; me queda en xmm1 basura| ceros o -1s
-
-	punpcklbw xmm1, xmm1 ; paso de bytes a words
-
-	movups xmm2, xmm1
-
-	punpcklwd xmm2, xmm1 ; paso de words a doble words el pixel de la pte baja
-
-	punpckhwd xmm1, xmm1 ; paso de words a double words el pixel de la pte alta
-
-	movups xmm0, xmm1
-
-	call pasarDeMenosUnoAUnoYDeCeroAMenosUno
-
-	movups xmm1, xmm0
-
-	movups xmm0, xmm2
-
-	call pasarDeMenosUnoAUnoYDeCeroAMenosUno
-
-	addps xmm1, xmm6
-
-	addps xmm2, xmm6
-
-	pxor xmm0, xmm0
-
-	punpcklwd xmm7, xmm0
-
-	movups xmm8, xmm7
-
-	punpckhwd xmm8, xmm0
-	punpcklwd xmm7, xmm0
-
-	mulps xmm7, xmm2
-	mulps xmm8, xmm1
-
-	packssdw xmm8, xmm7 ; quyedan pixel1|pixel0
-
-	packsswb xmm8, xmm8 ; quedan pixel1|pixel0|pixel1|pixel0
-
-	movq [rsi + 4], xmm8
-
-	lea rdi, [rdi + 16]
-
-	cmp r12, rax
-
-	jne .ciclo
-
-
-	ret
 	
-	
+
 ; pasarle un registro con floats sino no funca naAaaaaa!
-
-
 pasarDeMenosUnoAUnoYDeCeroAMenosUno:
 ; en xmm0 me viene el registro a cambiar de a dobles words son
 
 pxor xmm14, xmm14 ; foward clean
+cvtdq2ps xmm14, xmm14
 
 movdqu xmm15, [MenosUnosEnDobleW]	; les meto toddas F
 cvtdq2ps xmm15, xmm15		; los convierto en floats
@@ -191,7 +211,10 @@ movups xmm13, xmm0
 
 cmpps xmm13, xmm14, 0		; en donde habia ceros ahora hay menos unos y donde habia unos quedan ceros
 
-addps xmm0, xmm13 			; ahora en xmm0 me qda donde habia ceros en un principio menos unos  y donde habia efes en un princio unos
+cvtps2dq xmm0, xmm0
+
+paddd xmm0,xmm13
+
 ret
 
 
