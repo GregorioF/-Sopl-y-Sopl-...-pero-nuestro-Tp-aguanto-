@@ -25,15 +25,15 @@ MenosUnosEnDobleW: db 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
 mascaraPrueba: db 0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00
 mascaraMaximos: db 0x00, 0x00, 0x00, 0x00, 0x04, 0x04, 0x04, 0x04, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
 mascaraUnos: db 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00
-mascaraUltraAux: db 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00
 
 section .text
 
 colorizar_asm:
 	push r12
 	sub rsp, 8
-
+	
 	movups xmm6, xmm0
+	pshufd xmm6, xmm6, 00000000b
 	movdqu xmm5, [mascaraMaximos]
 	
 	xor r9, r9  ; mi current sobre filas
@@ -41,6 +41,7 @@ colorizar_asm:
 	xor r10, r10 ; mi current sobre columnas
 	sub rcx, 2 ; para no contemplar las dos filas que no proceso
 	sub rdx, 2 ; misma situacion
+	add rsi, 4
 	.ciclo1:
 		
 		xor r10, r10
@@ -53,23 +54,22 @@ colorizar_asm:
 			add r11, r8
 			add r11, r8		; sumo dos veces para obtener la ultima fila dela q me interesa sacar datos
 			;====
-			movups xmm1, [rdi + r11]	; xmm1 == p3|p2|p1|p0     
+			movdqu xmm1, [rdi + r11]	; xmm1 == p3|p2|p1|p0     
 			
 			;=== cuenta auxiliar para direccionamiento correcto
 			lea r11, [r10*4]
 			add r11, r8
 			;===			
 			
-			movups xmm7, [rdi + r11]	; xmm2 == p7|p6|p5|p4    			
-			movups xmm2, xmm7			; salvo estos en xmm2
-			movups xmm13, xmm7
+			movdqu xmm7, [rdi + r11]	; xmm2 == p7|p6|p5|p4    			
+			movdqu xmm2, xmm7			; salvo estos en xmm2
+			movdqu xmm13, xmm7
 			
 			;===
-			movups xmm3, [rdi+r10*4]	; xmm3 == p11|p10|p9|p8      
+			movdqu xmm3, [rdi+r10*4]	; xmm3 == p11|p10|p9|p8      
 			;=== listo levante tdoso los datos q qria
 			
-			
-			pmaxub xmm1, xmm2 ; guardo el maximo de cada byte en xmm1 
+			pmaxub xmm1, xmm2 
 			pmaxub xmm1, xmm3 ; guardo el max en xmm1 ==  pMax {3,7,11} | pmax{2,6,10}| pmax {1,5,9}| pmax {0,4,8}
 
 			movups xmm3, xmm1 ; copio
@@ -102,14 +102,12 @@ colorizar_asm:
 
 			pcmpeqb xmm1, xmm2 ; comparo el mayor de todos con los  maximos de cada canal en pixel 1 y 2
 			
-			;====== termino secccion en xmm1 me qda -1 en el byte de posicion igual al canal q tiene al maximo
+			;====== termino secccion en xmm1 me qda -1 en el byte de posicion igual al canal q tiene al maximo 0 en el resto
 			;====== xmm1== fruta | fruta | InfoCopada2 | InfoCopada1
 			
 
 			punpcklbw xmm1, xmm1  ; xmm1 == InfoCopada2High| I.C.2.L | I.C.1.H | I.C.1.L|
 				
-			movups xmm2, xmm1	
-
 			punpcklwd xmm2, xmm1 ;  en cada dw me qda info copada sobre cada canala respectivamente del Pixel 1
 
 			punpckhwd xmm1, xmm1 ; en cada dw me qda info copada sobre cada canal respectivamente del Pixel 2
@@ -133,6 +131,7 @@ colorizar_asm:
 			
 			movups xmm5, xmm6	 	; le pongo en xmm5 el registro con los alphas
 
+			
 			mulps xmm6, xmm1 		; le multiplico al alfa  por uno si esta en la posicion de pixel maximo
 									; o un -1 en caso contrario ACA QUEDAN LOS ALFAS DLEP IXEL 2
 									
@@ -152,15 +151,19 @@ colorizar_asm:
 			
 			punpcklbw xmm7, xmm0  ; xmm7 == p5 | p4
 			
-			movups xmm8, xmm7	 ;xmm8 == p5|p4
+			movdqu xmm8, xmm7	 ;xmm8 == p5|p4
 
 			punpckhwd xmm8, xmm0 ; xmm8 == p5a | p5r | p5g |p5b
+			
+			;====================================================
 			
 			punpckhbw xmm9, xmm0  ; xmm9 == p7 | p6
 			
 			movups xmm7, xmm9  ; xmm7 == p7 | p6
 			
 			punpcklwd xmm7, xmm0	; xmm7 == p6a | p6r | p6g |p6b
+			
+			;====================================================
 			
 			cvtdq2ps xmm8, xmm8
 			cvtdq2ps xmm7, xmm7		; PASO AMBOS A FLOAT PARA PODER MULTIPLICAR POR EL VALOR DE CADA ALPHA
@@ -171,9 +174,9 @@ colorizar_asm:
 			cvtps2dq xmm8, xmm8
 			cvtps2dq xmm7, xmm7
 
-			packssdw xmm8, xmm7 ; quyedan pixel1|pixel0
+			packusdw xmm8, xmm7 ; quyedan pixel1|pixel0
 
-			packsswb xmm8, xmm8 ; quedan pixel1|pixel0|pixel1|pixel0
+			packuswb xmm8, xmm8 ; quedan pixel1|pixel0|pixel1|pixel0
 			
 			movq [rsi + r10*4], xmm8
 			
@@ -183,6 +186,8 @@ colorizar_asm:
 			jne .ciclo2
 		
 		add r9, 1 
+		add rdi,r8
+		add rsi,r8
 		
 		jmp .ciclo1
 
