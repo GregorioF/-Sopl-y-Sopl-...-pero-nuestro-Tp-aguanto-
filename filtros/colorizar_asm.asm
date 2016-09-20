@@ -30,18 +30,26 @@ section .text
 
 colorizar_asm:
 	push r12
+<<<<<<< HEAD
+	sub rsp, 8	
+	movdqu xmm12, xmm0		; xmm12 siempre va a tener mi alpha inicial y fuckin punto
+	
+	
+=======
 	sub rsp, 8
 
 	movups xmm6, xmm0
 	pshufd xmm6, xmm6, 00000000b
 	movdqu xmm5, [mascaraMaximos] ; xmm5 == , 0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08, 0x04, 0x04, 0x04, 0x04, 0x00, 0x00, 0x00, 0x00
 
+>>>>>>> 297d769e18eac0fcc33c3917d4d8d7618343906c
 	xor r9, r9  ; mi current sobre filas
 	add r9, 1 ; para no contemplar la primer fila
 	xor r10, r10 ; mi current sobre columnas
 	sub rcx, 2 ; para no contemplar las dos filas que no proceso
 	sub rdx, 2 ; misma situacion
-	add rsi, 4
+	add rsi, 4 ; siempre escribo sin contar el primero
+	add rdi, r8
 	.ciclo1:
 
 		xor r10, r10
@@ -49,6 +57,10 @@ colorizar_asm:
 		je .fin
 
 		.ciclo2:
+			movups xmm6, xmm12
+			pshufd xmm6, xmm6, 00000000b
+			movdqu xmm5, [mascaraMaximos]
+			
 			;==== cuenta auxliar para direccionamiento correcto
 			lea r11, [r10*4] ; mi current en columnas
 			add r11, r8
@@ -68,8 +80,14 @@ colorizar_asm:
 			;===
 			movdqu xmm3, [rdi+r10*4]	; xmm3 == p11|p10|p9|p8
 			;=== listo levante tdoso los datos q qria
+<<<<<<< HEAD
+			
+			.parada1:
+			pmaxub xmm1, xmm2 
+=======
 
 			pmaxub xmm1, xmm2
+>>>>>>> 297d769e18eac0fcc33c3917d4d8d7618343906c
 			pmaxub xmm1, xmm3 ; guardo el max en xmm1 ==  pMax {3,7,11} | pmax{2,6,10}| pmax {1,5,9}| pmax {0,4,8}
 
 			movups xmm3, xmm1 ; copio
@@ -108,8 +126,15 @@ colorizar_asm:
 
 
 			punpcklbw xmm1, xmm1  ; xmm1 == InfoCopada2High| I.C.2.L | I.C.1.H | I.C.1.L|
+<<<<<<< HEAD
+				
+			movups xmm2, xmm1
+			
+			punpcklwd xmm2, xmm1 ;  en cada dw me qda info copada sobre cada canala respectivamente del Pixel 1
+=======
 
 			punpcklwd xmm2, xmm1 ;  en cada dw me qda info copada sobre cada canal respectivamente del Pixel 1
+>>>>>>> 297d769e18eac0fcc33c3917d4d8d7618343906c
 
 			punpckhwd xmm1, xmm1 ; en cada dw me qda info copada sobre cada canal respectivamente del Pixel 2
 
@@ -149,7 +174,12 @@ colorizar_asm:
 			pxor xmm0, xmm0
 
 			movups xmm9, xmm7		; xmm9 == p7|p6|p5|p4
+<<<<<<< HEAD
+			
+			.parada2:
+=======
 
+>>>>>>> 297d769e18eac0fcc33c3917d4d8d7618343906c
 			punpcklbw xmm7, xmm0  ; xmm7 == p5 | p4
 
 			movdqu xmm8, xmm7	 ;xmm8 == p5|p4
@@ -165,7 +195,11 @@ colorizar_asm:
 			punpcklwd xmm7, xmm0	; xmm7 == p6a | p6r | p6g |p6b
 
 			;====================================================
+<<<<<<< HEAD
+			.parada3:
+=======
 
+>>>>>>> 297d769e18eac0fcc33c3917d4d8d7618343906c
 			cvtdq2ps xmm8, xmm8
 			cvtdq2ps xmm7, xmm7		; PASO AMBOS A FLOAT PARA PODER MULTIPLICAR POR EL VALOR DE CADA ALPHA
 
@@ -174,7 +208,7 @@ colorizar_asm:
 
 			cvtps2dq xmm8, xmm8
 			cvtps2dq xmm7, xmm7
-
+			.parada4:
 			packusdw xmm8, xmm7 ; quyedan pixel1|pixel0
 
 			packuswb xmm8, xmm8 ; quedan pixel1|pixel0|pixel1|pixel0
