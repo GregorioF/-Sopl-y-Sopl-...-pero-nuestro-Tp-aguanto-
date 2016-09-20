@@ -28,6 +28,7 @@ smalltiles_asm:
 	mov r12, rcx	; en r12 tengo la cantidad de filas que hay
 	shr r12, 1		; ahora la mitad
 	mov qword j, 0
+	sub rdi, 4
 	
 		
 	.opAux:
