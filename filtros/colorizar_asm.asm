@@ -97,11 +97,11 @@ colorizar_asm:
 
 			psrldq xmm1, 1 ; shifteo 1 byte, xmm1 == | 0 |  -  | ... | -  | 		a2   | max2(r)  |  max2(g) | max2(b)  | 		 a1	  |  max1(r) | max1(g)  |
 
-			pmaxsb xmm1,xmm2 							 ; xmm1 == | - |  -  | ... | -  | max(a,r) | max(r,g) | max(g,b) | max(b,a) | max(a,r) | max(r,g) | max(g,b) |
+			pmaxub xmm1,xmm2 							 ; xmm1 == | - |  -  | ... | -  | max(a,r) | max(r,g) | max(g,b) | max(b,a) | max(a,r) | max(r,g) | max(g,b) |
 
 			psrldq xmm1,1 ;  shifteo 1 byte, xmm1 == | 0 |  -  | ... | -  | 	 -		 | max(a,r) | max(r,g) | max(g,b) | max(b,a) | max(a,r) | max(r,g) |
 
-			pmaxsb xmm1, xmm2 ;  xmm1 =  | - | ... |  -  || -  | - | - | maxP2 (g,b,r) || - | - | - | maxP1 (g,b,r) ||
+			pmaxub xmm1, xmm2 ;  xmm1 =  | - | ... |  -  || -  | - | - | maxP2 (g,b,r) || - | - | - | maxP1 (g,b,r) ||
 
 			pshufb xmm1, xmm5 ; xmm1 == || fruta || fruta || maxP2(g,b,r) | ... | maxP2(g,b,r) || maxP1(g,b,r) | ... | maxP1(g,b,r) ||
 
