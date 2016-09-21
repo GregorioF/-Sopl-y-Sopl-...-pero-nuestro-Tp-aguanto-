@@ -39,7 +39,7 @@ colorizar_asm:
 	sub rcx, 2 ; para no contemplar las dos filas que no proceso
 	sub rdx, 2 ; misma situacion
 	add rsi, 4 ; siempre escribo sin contar el primero
-	add rdi, r8
+	add rsi, r8
 	.ciclo1:
 
 		xor r10, r10

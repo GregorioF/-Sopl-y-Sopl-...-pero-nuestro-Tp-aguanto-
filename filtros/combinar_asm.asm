@@ -173,13 +173,19 @@ combinar_asm:
 					addps xmm4, xmm2
 					addps xmm7, xmm6
 
+					cvtps2dq xmm15, xmm15 
+					cvtps2dq xmm8, xmm8 
+					cvtps2dq xmm4, xmm4 
+					cvtps2dq xmm7, xmm7 
+
+					
 ; ============ Empaqueto ========================================
 					packusdw xmm7, xmm4 ; empaqueto de dw a w, xmm7 == pixel de xmm4, es decir, el pixel 2, seguido del pixel de xmm7, el 3
 					packusdw xmm8, xmm15 ; empaqueto de dw a w, xmm8 == pixel de xmm15, es decir, el pixel 0, seguido del pixel de xmm8, el 1
 					packuswb xmm7, xmm8 ; empaqueto de w a b, xmm7 == pixel 0, pixel 1, pixel 2, pixel 3
 
 ; ============ Pongo en la imagen destino en la mitad derecha de la imagen =======================
-					movdqu [r12 + 4*r14], xmm13   ;NOSE SI ESTA BIEN ES UNA PRUEBA (GOYO)
+					movdqu [r12 + 4*r14], xmm7   ;NOSE SI ESTA BIEN ES UNA PRUEBA (GOYO)
 
 					add r9, 4 ; como cada vez se procesan 4 píxeles de la imagen destino, se avanzan 4 columnas
 					mov r14, r9
