@@ -9,6 +9,18 @@
 #include "helper/utils.h"
 #include "helper/imagenes.h"
 
+int romperCache(){
+	int* a=malloc(4*1000);
+	int i =0;
+	int res = 0;
+	while(i < 4000){
+		a[i]=0;
+		res = res +a[i];
+		i+=1;
+	}
+	return res;		
+}
+
 // ~~~ seteo de los filtros ~~~
 
 #define N_ENTRADAS_colorizar 1
@@ -108,9 +120,11 @@ void correr_filtro_imagen(configuracion_t *config, aplicador_fn_t aplicador, uns
 	else
 	{
 		imagenes_abrir(config);
+		//int tuvi = romperCache();
 		unsigned long long start, end;
 		MEDIR_TIEMPO_START(start)
 		for (int i = 0; i < config->cant_iteraciones; i++) {
+				romperCache();
 				aplicador(config);
 		}
 		MEDIR_TIEMPO_STOP(end)

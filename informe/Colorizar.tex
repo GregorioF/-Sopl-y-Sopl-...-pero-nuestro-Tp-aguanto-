@@ -1,0 +1,13 @@
+\section{Colorizar}
+
+\subsection{Codigo C}
+	El codigo C se trata de una conjuncion de Fors, el exterior que recorre desde la segunda fila hasta la ante ultima,  y el interior que recorre desde la segunda columna hasta la ultima, dejando asi afuera a todos los bordes, tal como el enunciado decia. Luego en cada iteracion del ciclo interior, que es donde se hace las opearciones que modifican la imagen, lo que hacemos es crear un arreglo de unsinged chars, "res", que es  donde guardamos los maximos de cada canal en comparacion a todos  los pixeles lindantes del pixel en el cual estemos parado.
+	\begin{itemize}
+	\item {Res [0] $\leftarrow$ MaximoLindantesAzul
+	\item {Res [1] $\leftarrow$ MaximoLindantesVerde}
+	\item {Res [2] $\leftarrow$ MaximoLindantesRojo}
+	\end{itemize}
+Luego con estos tres valores calculamos el alpha correspondiente de cada canal por el cual voy a multiplicar a cada uno. Y por ultimo reescribimos el pixel final, en la imagen source con cada canal multiplicado  por dicho alpha.
+
+\subsection{Codigo Asm}
+	El codigo en ASM se trata tambien de una conjuncion de ciclos que 
