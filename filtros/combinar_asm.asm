@@ -29,6 +29,14 @@ section .text
 
 combinar_asm:
 ; SE CONSIDERA QUE EL ANCHO ES MÚLTIPLO DE 4 Y HAY QUE VER SI ANDA EN CASO DE NO SER MÚLTIPLO DE 16
+	push rbp
+	mov rbp, rsp
+	push rbx
+	push r12
+	push r13
+	push r14
+	push r15
+	
 	sub rsp, 8
 
 	pxor xmm9, xmm9
@@ -43,7 +51,7 @@ combinar_asm:
 .cicloExterno:
 		cmp r10, rcx ; comparo r10 con la cantidad de filas
 		je .fin ; si es igual ya terminó de recorrer la matriz y salto al final
-		mov r9, 0 ; si no, pongo un 0 en el contador de columnas y voy al ciclo Interno
+		xor r9, r9  ; si no, pongo un 0 en el contador de columnas y voy al ciclo Interno
 		mov r14, r9
 		mov r11, rdi ; r11 == rdi
 		add r11, r8 ; r11 == rdi + tamaño de la fila
@@ -55,7 +63,11 @@ combinar_asm:
 			.cicloInterno:
 					movdqu xmm1, [rdi + 4*r9] ; agarro 4 píxeles de la mitad izquierda de la foto		; xmm1 = p3|p2|p1|p0
 					movdqu xmm2, xmm1
-					movdqu xmm3, [r11 + 4*r14] ; agarro 4 píxeles de la mitad derecha de la foto		; xmm3 = p7|p6|p5|p4
+					;===============0000
+					mov r15, r14
+					imul r15, 4
+					;===============0000
+					movdqu xmm3, [r11 + r15] ; agarro 4 píxeles de la mitad derecha de la foto		; xmm3 = p7|p6|p5|p4
 					movdqu xmm4, xmm3
 					punpcklbw xmm1, xmm9 ; | 0 | píxel 1 a | 0 | píxel 1 r | 0 | píxel 1 g | 0 | píxel 1 b | 0 | píxel 0 a | 0 | píxel 0 r | 0 | píxel 0 g | 0 | píxel 0 b |
 					punpckhbw xmm2, xmm9 ; | 0 | píxel 3 a | 0 | píxel 3 r | 0 | píxel 3 g | 0 | píxel 3 b | 0 | píxel 2 a | 0 | píxel 2 r | 0 | píxel 2 g | 0 | píxel 2 b |
@@ -73,7 +85,7 @@ combinar_asm:
 					punpckhwd xmm6, xmm9 ; | 0 | 0 | 0 | píxel 3 a | 0 | 0 | 0 | píxel 3 r | 0 | 0 | 0 | píxel 3 g | 0 | 0 | 0 | píxel 3 b |
 					punpcklwd xmm3, xmm9 ; | 0 | 0 | 0 | píxel 4 a | 0 | 0 | 0 | píxel 4 r | 0 | 0 | 0 | píxel 4 g | 0 | 0 | 0 | píxel 4 b |
 					punpckhwd xmm7, xmm9 ; | 0 | 0 | 0 | píxel 5 a | 0 | 0 | 0 | píxel 5 r | 0 | 0 | 0 | píxel 5 g | 0 | 0 | 0 | píxel 5 b |
-					punpckhwd xmm4, xmm9 ; | 0 | 0 | 0 | píxel 6 a | 0 | 0 | 0 | píxel 6 r | 0 | 0 | 0 | píxel 6 g | 0 | 0 | 0 | píxel 6 b |
+					punpcklwd xmm4, xmm9 ; | 0 | 0 | 0 | píxel 6 a | 0 | 0 | 0 | píxel 6 r | 0 | 0 | 0 | píxel 6 g | 0 | 0 | 0 | píxel 6 b |
 					punpckhwd xmm8, xmm9 ; | 0 | 0 | 0 | píxel 7 a | 0 | 0 | 0 | píxel 7 r | 0 | 0 | 0 | píxel 7 g | 0 | 0 | 0 | píxel 7 b |
 
 					movdqu xmm10, xmm1
@@ -185,7 +197,11 @@ combinar_asm:
 					packuswb xmm7, xmm8 ; empaqueto de w a b, xmm7 == pixel 0, pixel 1, pixel 2, pixel 3
 
 ; ============ Pongo en la imagen destino en la mitad derecha de la imagen =======================
-					movdqu [r12 + 4*r14], xmm7   ;NOSE SI ESTA BIEN ES UNA PRUEBA (GOYO)
+					;====000
+					mov r15, r14
+					imul r15, 4
+					;====000
+					movdqu [r12 + r15], xmm7   ;NOSE SI ESTA BIEN ES UNA PRUEBA (GOYO)
 
 					add r9, 4 ; como cada vez se procesan 4 píxeles de la imagen destino, se avanzan 4 columnas
 					mov r14, r9
@@ -200,4 +216,10 @@ combinar_asm:
 
 .fin:
 		add rsp, 8
+		pop r15
+		pop r14
+		pop r13
+		pop r12
+		pop rbx
+		pop rbp
 		ret
