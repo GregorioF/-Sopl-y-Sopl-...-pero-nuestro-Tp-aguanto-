@@ -40,7 +40,7 @@ colorizar_asm:
 	xor r9, r9  ; mi current sobre filas
 	add r9, 1 ; para no contemplar la primer fila
 	xor r10, r10 ; mi current sobre columnas
-	sub rcx, 2 ; para no contemplar las dos filas que no proceso
+	sub rcx, 1 ; para no contemplar las dos filas que no proceso
 	sub rdx, 2 ; misma situacion
 	add rsi, 4 ; siempre escribo sin contar el primero
 	add rsi, r8
