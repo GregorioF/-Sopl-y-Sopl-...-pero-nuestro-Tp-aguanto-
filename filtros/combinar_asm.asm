@@ -28,7 +28,6 @@ section .rodata
 section .text
 
 combinar_asm:
-; SE CONSIDERA QUE EL ANCHO ES MÚLTIPLO DE 4 Y HAY QUE VER SI ANDA EN CASO DE NO SER MÚLTIPLO DE 16
 	push rbp
 	mov rbp, rsp
 	push rbx
@@ -36,22 +35,28 @@ combinar_asm:
 	push r13
 	push r14
 	push r15
-	
+
 	sub rsp, 8
 
 	pxor xmm9, xmm9
 	xor r10, r10 ; pongo un 0 en mi contador de filas
-	xor r9, r9 ; pongo un 0 en mi contador de columnas
+	xor r9, r9 ; pongo un 0 en mi contador de iteraciones
 	xor r11, r11
 	xor r14, r14
 	pshufd xmm0, xmm0, 00000000b ; El alpha era un float que sólo estaba en los "primeros" (últimos) 4 bytes de xmm0, entonces no iba a multiplicar bien.
 																; Paso el alpha a los otros lugares: xmm0 == | alpha | alpha | alpha | alpha |
 	movdqu xmm14, [mascara255] ; paso a un registro lo de la máscara fuera de los ciclos porque como es un acceso a memoria quiero minimizar la cantidad de veces que se hace.
-	shr rdx, 1 ; como la imagen destino se completa de ambos lados en cada iteración de columna, voy hasta la mitad
+	mov rax, rdx ; muevo el ancho de las filas (en píxeles) a rax
+	xor rdx, rdx ; rdx == 0
+	mov rbx, 8
+	div rbx ; divido por 8. Queda en eax el cociente de la división y en rdx el resto.
+
 .cicloExterno:
 		cmp r10, rcx ; comparo r10 con la cantidad de filas
 		je .fin ; si es igual ya terminó de recorrer la matriz y salto al final
 		xor r9, r9  ; si no, pongo un 0 en el contador de columnas y voy al ciclo Interno
+		xor rbx, rbx
+		mov rbx, 0
 		mov r14, r9
 		mov r11, rdi ; r11 == rdi
 		add r11, r8 ; r11 == rdi + tamaño de la fila
@@ -61,6 +66,8 @@ combinar_asm:
 		sub r12, 16 ; r12 == rsi + tamaño de la fila - 16
 
 			.cicloInterno:
+					cmp rbx, rax ; comparo r9 con la cantidad de veces que entran 8 píxeles, con el cociente de la división.
+					je .QuizasFaltaProcesar ; si no es igual falta procesar píxeles en esa fila
 					movdqu xmm1, [rdi + 4*r9] ; agarro 4 píxeles de la mitad izquierda de la foto		; xmm1 = p3|p2|p1|p0
 					movdqu xmm2, xmm1
 					;===============0000
@@ -107,32 +114,15 @@ combinar_asm:
 					cvtdq2ps xmm12, xmm12 ; xmm12 == pixel 2 - pixel 5
 					cvtdq2ps xmm13, xmm13 ; xmm13 == pixel 3 - pixel 4
 
-					mulps xmm10, xmm0 ; Multiplico por alpha: xmm10 == | alpha *  | ... | ... | alpha *  | (pixel 0)
+					mulps xmm10, xmm0 ; Multiplico por alpha: xmm10 == | alpha *  | ... | ... | alpha *  | (pixel 0 - pixel 3)
 					mulps xmm11, xmm0 ; xmm11 == alpha * ( pixel 1 - pixel 6)
 					mulps xmm12, xmm0 ; xmm12 == alpha * ( pixel 2 - pixel 5)
 					mulps xmm13, xmm0 ; xmm13 == alpha * ( pixel 3 - pixel 4)
 
-				;	movdqu xmm15, xmm1 ; Muevo xmm1 a otro registro porque en xmm1 se hace la división
-
-				;	movdqu xmm1, xmm10
-				;	divps xmm14 ; Hago la división con xmm1
-				;	movdqu xmm10, xmm1 ; Pongo el resultado donde lo quiero
-				;	movdqu xmm1, xmm11 ; tengo que mover a xmm1 para poder hacer la división de lo que hay en xmm11
-				;	divps xmm14
-				;	movdqu xmm11, xmm1
-				;	movdqu xmm1, xmm12
-				;	divps xmm14
-				;	movdqu xmm12, xmm1
-				;	movdqu xmm1, xmm13
-				;	divps xmm14
-				;	movdqu xmm13, xmm1
-
-				;	movdqu xmm1, xmm15 ; Reestablezco xmm1
-
-				divps xmm10, xmm14 ; xmm10 == alpha * ( pixel 0 - pixel 7)  / 255
-				divps xmm11, xmm14 ; xmm11 == alpha * ( pixel 1 - pixel 6)  / 255
-				divps xmm12, xmm14 ; xmm12 == alpha * ( pixel 2 - pixel 5)  / 255
-				divps xmm13, xmm14 ; xmm13 == alpha * ( pixel 3 - pixel 4)  / 255
+					divps xmm10, xmm14 ; xmm10 == alpha * ( pixel 0 - pixel 7)  / 255
+					divps xmm11, xmm14 ; xmm11 == alpha * ( pixel 1 - pixel 6)  / 255
+					divps xmm12, xmm14 ; xmm12 == alpha * ( pixel 2 - pixel 5)  / 255
+					divps xmm13, xmm14 ; xmm13 == alpha * ( pixel 3 - pixel 4)  / 255
 
 ; ============ Sumo el píxel de la parte espejada ==============
 					addps xmm10, xmm8 ; xmm10 == ( alpha * ( pixel 0 - pixel 7)  / 255 )  + pixel 7 = src 0
@@ -149,15 +139,13 @@ combinar_asm:
 					subps xmm4, xmm7
 					movups xmm7, xmm13
 					subps xmm7, xmm3
-					
-; ============ Vuelvo a convertir a entero
-					cvtps2dq xmm10, xmm10 
-					cvtps2dq xmm11, xmm11 
-					cvtps2dq xmm12, xmm12 
-					cvtps2dq xmm13, xmm13 
 
-					
-					
+; ============ Vuelvo a convertir a entero
+					cvtps2dq xmm10, xmm10
+					cvtps2dq xmm11, xmm11
+					cvtps2dq xmm12, xmm12
+					cvtps2dq xmm13, xmm13
+
 ; ============ Empaqueto ========================================
 					packusdw xmm13, xmm12 ; empaqueto de dw a w, xmm13 == pixel de xmm12, es decir, el pixel 2, seguido del pixel de xmm13, el 3
 					packusdw xmm11, xmm10 ; empaqueto de dw a w, xmm11 == pixel de xmm10, es decir, el pixel 0, seguido del pixel de xmm11, el 1
@@ -185,12 +173,11 @@ combinar_asm:
 					addps xmm4, xmm2
 					addps xmm7, xmm6
 
-					cvtps2dq xmm15, xmm15 
-					cvtps2dq xmm8, xmm8 
-					cvtps2dq xmm4, xmm4 
-					cvtps2dq xmm7, xmm7 
+					cvtps2dq xmm15, xmm15
+					cvtps2dq xmm8, xmm8
+					cvtps2dq xmm4, xmm4
+					cvtps2dq xmm7, xmm7
 
-					
 ; ============ Empaqueto ========================================
 					packusdw xmm7, xmm4 ; empaqueto de dw a w, xmm7 == pixel de xmm4, es decir, el pixel 2, seguido del pixel de xmm7, el 3
 					packusdw xmm8, xmm15 ; empaqueto de dw a w, xmm8 == pixel de xmm15, es decir, el pixel 0, seguido del pixel de xmm8, el 1
@@ -206,8 +193,88 @@ combinar_asm:
 					add r9, 4 ; como cada vez se procesan 4 píxeles de la imagen destino, se avanzan 4 columnas
 					mov r14, r9
 					imul r14, -1
-					cmp r9, rdx ; comparo r9 con la cantidad de columnas
+					add rbx, 1
+					cmp rbx, rax ; comparo r9 con la cantidad de veces que entran 8 píxeles, con el cociente de la división
 					jne .cicloInterno ; si no es igual falta procesar píxeles en esa fila
+
+.QuizasFaltaProcesar:
+					; veo si falta procesar 4 píxeles en el medio o si ya está esta fila
+					cmp rdx, 4 ; el resto de la división por 8 con 4
+					je .faltaProcesar
+		 ; ya se procesó todo y terminé la fila
+		add rdi, r8
+		add rsi, r8
+		add r10, 1 ; r8 = r8 + 1
+		jmp .cicloExterno
+
+.faltaProcesar:					; quedan 4 píxeles en el medio que falta procesar
+		movdqu xmm1, [rdi + 4*r9] ; agarro 4 píxeles de la mitad izquierda de la foto		; xmm1 = p3|p2|p1|p0
+		movdqu xmm2, xmm1
+		;===============0000
+
+		;===============0000
+		punpcklbw xmm1, xmm9 ; | 0 | píxel 1 a | 0 | píxel 1 r | 0 | píxel 1 g | 0 | píxel 1 b | 0 | píxel 0 a | 0 | píxel 0 r | 0 | píxel 0 g | 0 | píxel 0 b |
+		punpckhbw xmm2, xmm9 ; | 0 | píxel 3 a | 0 | píxel 3 r | 0 | píxel 3 g | 0 | píxel 3 b | 0 | píxel 2 a | 0 | píxel 2 r | 0 | píxel 2 g | 0 | píxel 2 b |
+
+		movdqu xmm5, xmm1
+		movdqu xmm6, xmm2
+
+		punpcklwd xmm1, xmm9 ; | 0 | 0 | 0 | píxel 0 a | 0 | 0 | 0 | píxel 0 r | 0 | 0 | 0 | píxel 0 g | 0 | 0 | 0 | píxel 0 b |
+		punpckhwd xmm5, xmm9 ; | 0 | 0 | 0 | píxel 1 a | 0 | 0 | 0 | píxel 1 r | 0 | 0 | 0 | píxel 1 g | 0 | 0 | 0 | píxel 1 b |
+		punpcklwd xmm2, xmm9 ; | 0 | 0 | 0 | píxel 2 a | 0 | 0 | 0 | píxel 2 r | 0 | 0 | 0 | píxel 2 g | 0 | 0 | 0 | píxel 2 b |
+		punpckhwd xmm6, xmm9 ; | 0 | 0 | 0 | píxel 3 a | 0 | 0 | 0 | píxel 3 r | 0 | 0 | 0 | píxel 3 g | 0 | 0 | 0 | píxel 3 b |
+
+		movdqu xmm10, xmm1
+		movdqu xmm11, xmm5
+		movdqu xmm12, xmm2
+		movdqu xmm13, xmm6
+
+		psubd xmm10, xmm6 ; resto los 2 píxeles correspondientes, | 0 | 0 | 0 | píxel 0 a - píxel 3 a | 0 | 0 | 0 | píxel 0 r - píxel 3 r | 0 | 0 | 0 | píxel 0 g - píxel 3 g | 0 | 0 | 0 | píxel 0 b -píxel 3 b |
+		psubd xmm11, xmm2 ; resto los 2 píxeles correspondientes
+		psubd xmm12, xmm5
+		psubd xmm13, xmm1 ; resto los 2 píxeles correspondientes, | 0 | 0 | 0 | píxel 3 a - píxel 0 a | 0 | 0 | 0 | píxel 3 r - píxel 0 r | 0 | 0 | 0 | píxel 3 g - píxel 0 g | 0 | 0 | 0 | píxel 3 b -píxel 0 b |
+
+		; =============== Convierto a precisión simple los que voy a sumar ======
+		cvtdq2ps xmm1, xmm1 ; xmm1 == | píxel 0 a | píxel 0 r | píxel 0 g | píxel 0 b |
+		cvtdq2ps xmm5, xmm5 ; xmm5 == píxel 1
+		cvtdq2ps xmm2, xmm2 ; xmm2 == píxel 2
+		cvtdq2ps xmm6, xmm6 ; xmm6 == píxel 3
+
+		cvtdq2ps xmm10, xmm10 ; xmm10 == | píxel 0 a - píxel 3 a | píxel 0 r - píxel 3 r | píxel 0 g - píxel 3 g | píxel 0 b - píxel 3 b |
+		cvtdq2ps xmm11, xmm11 ; xmm11 == pixel 1 - pixel 2
+		cvtdq2ps xmm12, xmm12 ; xmm11 == pixel 2 - pixel 1
+		cvtdq2ps xmm13, xmm13 ; xmm11 == pixel 3 - pixel 0
+
+		mulps xmm10, xmm0 ; Multiplico por alpha: xmm10 == | alpha *  | ... | ... | alpha *  | (pixel 0 - pixel 3)
+		mulps xmm11, xmm0 ; xmm11 == alpha * ( pixel 1 - pixel 2)
+		mulps xmm11, xmm0 ; xmm11 == alpha * ( pixel 2 - pixel 1)
+		mulps xmm11, xmm0 ; xmm11 == alpha * ( pixel 3 - pixel 0)
+
+		divps xmm10, xmm14 ; xmm10 == alpha * ( pixel 0 - pixel 3)  / 255
+		divps xmm11, xmm14 ; xmm11 == alpha * ( pixel 1 - pixel 2)  / 255
+		divps xmm12, xmm14 ; xmm12 == alpha * ( pixel 2 - pixel 1)  / 255
+		divps xmm13, xmm14 ; xmm13 == alpha * ( pixel 3 - pixel 0)  / 255
+
+		; ============ Sumo el píxel de la parte espejada ==============
+		addps xmm10, xmm6 ; xmm10 == ( alpha * ( pixel 0 - pixel 3)  / 255 )  + pixel 3 = src 0
+		addps xmm11, xmm2 ; xmm11 == ( alpha * ( pixel 1 - pixel 2)  / 255 )  + pixel 2 = src 1
+		addps xmm12, xmm5 ; xmm12 == ( alpha * ( pixel 2 - pixel 1)  / 255 )  + pixel 1 = src 2
+		addps xmm13, xmm1 ; xmm13 == ( alpha * ( pixel 3 - pixel 0)  / 255 )  + pixel 0 = src 3
+
+		; ============ Vuelvo a convertir a entero
+		cvtps2dq xmm10, xmm10
+		cvtps2dq xmm11, xmm11
+		cvtps2dq xmm12, xmm12
+		cvtps2dq xmm13, xmm13
+
+		; ============ Empaqueto ========================================
+		packusdw xmm13, xmm12 ; empaqueto de dw a w, xmm13 == pixel de xmm12, es decir, el pixel 2, seguido del pixel de xmm13, el 3
+		packusdw xmm11, xmm10 ; empaqueto de dw a w, xmm11 == pixel de xmm10, es decir, el pixel 0, seguido del pixel de xmm11, el 1
+		packuswb xmm13, xmm11 ; empaqueto de w a b, xmm13 == pixel 0, pixel 1, pixel 2, pixel 3
+		pshufd xmm11, xmm13, 0x1b		; esto porque tienen q ser al revez la de un lado a la del otro!
+
+		; ============ Pongo en la imagen destino en la mitad izquierda de la imagen =======================
+		movdqu [rsi + 4*r9], xmm11
 
 		add rdi, r8
 		add rsi, r8
