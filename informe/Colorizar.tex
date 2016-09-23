@@ -10,4 +10,23 @@
 Luego con estos tres valores calculamos el alpha correspondiente de cada canal por el cual voy a multiplicar a cada uno. Y por ultimo reescribimos el pixel final, en la imagen source con cada canal multiplicado  por dicho alpha.
 
 \subsection{Codigo Asm}
-	El codigo en ASM se trata tambien de una conjuncion de ciclos que 
+	El codigo en ASM se trata tambien de una conjuncion de ciclos. El recorre las filas desde la segunda hasta la anteUltima, y el interior recorre las columnas desde la segunda hasta la anteultima, pero saltando de a dos pixeles, que es la cantidad que procesamos simultaneamente con instruccciones SSE. 
+    El ciclo interior consta de tres partes, la primera es tan pronto se levanta de memoria los pixeles a procesar y todos sus lindantes, calculamos en dos registros los maximos de cada canal, de ambos pixeles a procesar con respecto a todos sus lindantes, y los guardamos ambos en un registro xmm. Luego la segunda parte es calcular el maximo de los maximos de ambos al mismo tiempo. Luego atravez de una par de operaciones, muy especificas para explicar, logro tener un registro xmm de dw, con cada dw representando un canal de cada pixel, en el orden establecido (argb), donde tengo un 1-alpha en la posicion del canal que no teine el maximo de los maximos, y un 1+alpha en la posicion que tiene al maximo de los maximos, y luego concluyo multiplicando a cada pixel por su registro con los alphas indicados, lo reduzco a tamaño de 32 bits por pixel, los uno y los escribo en el destino.
+	
+	
+\subsection{Experimentacion}
+\subsubsection{Idea}	En la experimentacion de este filtro al igual que en el resto vamos a comparar el rendimiento respecto a los ciclos de clock, que tiene la funcion colorizar en C desde -o0 a -o3 contra asm.
+	 Sin embargo luego vamos a contrastar la funcion de asm, contra sigo mismo pero primero agragando jumps de forma que no influya el flujo del programa solo para molestar al jump predictor. Luego vamos a correrlo tal cual esta, y de apoco vamos a ir desenrollando el codigo. Como dijimos tiene un ciclo externo y uno interno, por lo que vamos a desenrrollar primero el interno 2 veces, luego 4,16,32 y ver que pasa, y finalmente vamos a saltar a desenrrollarlo completamente, cosa de no dejar casi ninguno controlador de flujo.
+	   
+\subsubsection{Hipotesis}
+	Nuestra hipotesis es que el rendimiento va a ir mejorando a medida que vayamos cambiando los programas respectivamente a como los fui mencionando, osea el mas lento va a ser el codigo de asm, molestando al jmp predictor, y el mas rapido el desenrollando el codigo 32 veces. El ultimo test, por mas que desenrollemos todo el programa creemos justamente que va a ser el mas lento, por el tamaño del codigo, creemos que al hacer un codigo de tamaño mayor al de la cache, en un momento el pc va a estar haciendo muchisimos mas miss en la cache, que los que ahorra sacando los controladores de flujo.
+	
+	
+\subsubsection{Resultados}
+	Graficos lindos de lucia :D
+	
+	ciclos promedio colorizar original 10000 iteraciones:  	
+	
+	
+	
+\subsubsection{Hipotesis}

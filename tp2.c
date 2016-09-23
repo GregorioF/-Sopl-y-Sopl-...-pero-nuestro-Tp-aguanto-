@@ -14,7 +14,6 @@ int romperCache(){
 	int i =0;
 	int res = 0;
 	while(i < 4000){
-		a[i]=0;
 		res = res +a[i];
 		i+=1;
 	}
@@ -124,7 +123,6 @@ void correr_filtro_imagen(configuracion_t *config, aplicador_fn_t aplicador, uns
 		unsigned long long start, end;
 		MEDIR_TIEMPO_START(start)
 		for (int i = 0; i < config->cant_iteraciones; i++) {
-				romperCache();
 				aplicador(config);
 		}
 		MEDIR_TIEMPO_STOP(end)
