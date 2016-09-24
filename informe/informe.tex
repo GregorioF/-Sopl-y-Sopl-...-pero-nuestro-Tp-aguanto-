@@ -20,6 +20,7 @@
 \usepackage{sidecap}
 \usepackage{wrapfig}
 \usepackage{caption}
+\usepackage{tikz}
 
 % facilitates the creation of memory maps. Start address at the bottom, end address at the top.
 % syntax: \memsection{end address}{start address}{height in lines}{text in box}
@@ -33,6 +34,95 @@
 \bitbox{16}{#4} % print box with caption
 }
 
+\newcommand{\xmmdw}[5][]{
+\begin{center}
+\begin{tikzpicture}[xscale=1.15,yscale=.9]
+	\draw [very thick, rounded corners] (0,0) rectangle (16, 1);
+	\foreach \i in {4,8,12} {
+		\draw (\i, 0) -- (\i, 1);
+	}
+	\node at (2,.5) {#2};
+	\node at (6,.5) {#3};
+	\node at (10,.5) {#4};
+	\node at (14,.5) {#5};
+	\node[below] at (8, 0) {\texttt{#1}};
+	\node[below left] at (16, 0) {\footnotesize 0};
+	\node[below right] at (0, 0) {\footnotesize 16};
+\end{tikzpicture}
+\end{center}
+}
+
+\newcommand{\xmmw}[8]{
+\begin{center}
+\begin{tikzpicture}[xscale=1.15,yscale=.7]
+\draw [very thick, rounded corners] (0,0) rectangle (16, 1);
+	\foreach \i in {2,4,6,8,10,12,14} {
+		\draw (\i, 0) -- (\i, 1);
+	}
+	\node at (1,.5) {#1};
+	\node at (3,.5) {#2};
+	\node at (5,.5) {#3};
+	\node at (7,.5) {#4};
+	\node at (9,.5) {#5};
+	\node at (11,.5) {#6};
+	\node at (13,.5) {#7};
+	\node at (15,.5) {#8};
+	\node[below left] at (16, 0) {\footnotesize 0};
+	\node[below right] at (0, 0) {\footnotesize 16};
+
+\end{tikzpicture}
+\end{center}
+}
+
+\newcommand\xmmb[1][]{%
+	\def\xmmreg{#1}%
+	\xmmbcont
+}
+
+
+\newcommand\xmmbcont[8]{%
+    \def\tempa{#1}%
+    \def\tempb{#2}%
+    \def\tempc{#3}%
+    \def\tempd{#4}%
+    \def\tempe{#5}%
+    \def\tempf{#6}%
+    \def\tempg{#7}%
+    \def\temph{#8}%
+    \xmmbcontcont
+}
+
+\newcommand{\xmmbcontcont}[8]{
+\begin{center}
+\begin{tikzpicture}[xscale=1.15,yscale=.7]
+	\draw [very thick, rounded corners] (0,0) rectangle (16, 1);
+	\foreach \i in {1,...,15} {
+		\draw (\i, 0) -- (\i, 1);
+	}
+	
+	\node at (.5,.5) {\tempa};
+	\node at (1.5,.5) {\tempb};
+	\node at (2.5,.5) {\tempc};
+	\node at (3.5,.5) {\tempd};
+	\node at (4.5,.5) {\tempe};
+	\node at (5.5,.5) {\tempf};
+	\node at (6.5,.5) {\tempg};
+	\node at (7.5,.5) {\temph};
+	\node at (8.5,.5) {#1};
+	\node at (9.5,.5) {#2};
+	\node at (10.5,.5) {#3};
+	\node at (11.5,.5) {#4};
+	\node at (12.5,.5) {#5};
+	\node at (13.5,.5) {#6};
+	\node at (14.5,.5) {#7};
+	\node at (15.5,.5) {#8};
+
+	\node[below] at (8, 0) {\texttt{\xmmreg}};
+	\node[below left] at (16, 0) {\footnotesize 0};
+	\node[below right] at (0, 0) {\footnotesize 16};
+\end{tikzpicture}
+\end{center}
+}
 
 %%fancyhdr
 \pagestyle{fancy}

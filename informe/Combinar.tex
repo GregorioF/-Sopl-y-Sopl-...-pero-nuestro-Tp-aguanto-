@@ -1,5 +1,6 @@
 \section{Combinar}
-\par{Este filtro permite reutilizar cálculos debido a dos factores. Uno de ellos es la forma que tiene cada píxel generado en la imagen resultante, que consiste en que si se tienen una imagen $A$ y una imagen $B$ de tamaño $m \times n$ entonces el píxel de la imagen generada ${I_{AB}}^{i, j}$ se calcula de la siguiente forma:}
+\par{Este filtro consiste en realizar una combinación de dos imágenes que dependa de un número real $\alpha$ entre 0 y 255.}
+\par{Cabe destacar que este filtro permite reutilizar cálculos debido a dos factores. Uno de ellos es la forma que tiene cada píxel generado en la imagen resultante, que consiste en que si se tienen una imagen $A$ y una imagen $B$ de tamaño $m \times n$ entonces el píxel de la imagen generada ${I_{AB}}^{i, j}$ se calcula de la siguiente forma:}
 \[ {I_{AB}}^{i,j} = \dfrac{\alpha * ( {I_{A}}^{i,j} - {I_{B}}^{i,j} )}{255.0} + {I_{B}}^{i,j} \]
 \par{El otro factor es que nuestro filtro está optimizado para casos en los que la imagen $B$ es el reflejo vertical de la imagen $A$. Es decir que se da que ${I_{A}}^{i,j} = {I_{B}}^{i,n - j + 1}$ como se puede apreciar en la siguiente figura.}
 
@@ -36,7 +37,7 @@ y análogamente
 \begin{align}
 {I_{AB}}^{i,n - j + 1} &= -1 * \dfrac{\alpha * [-1 * ( {I_{A}}^{i,n - j + 1} - {I_{A}}^{i,j} )]}{255.0} - {I_{A}}^{i,n - j + 1} + {I_{A}}^{i,n - j + 1} + {I_{A}}^{i,j} \nonumber \\
 &= -1 * \Big[ \dfrac{\alpha * ( {I_{A}}^{i,j} - {I_{A}}^{i,n - j + 1} )}{255.0} + {I_{A}}^{i,n - j + 1} \Big] + {I_{A}}^{i,n - j + 1} + {I_{A}}^{i,j} \nonumber \\
-&= -1 * {I_{AB}}^{i,j} + {I_{A}}^{i,n - j + 1} + {I_{A}}^{i,j} \textup{usando la igualdad de (2)}
+&= -1 * ( {I_{AB}}^{i,j} - {I_{A}}^{i,n - j + 1} ) + {I_{A}}^{i,j} \textup{usando la igualdad de (2)}
 \end{align}
 
 \par{Estos cálculos muestran que luego de hacer el procesamiento para generar un píxel de la parte izquierda de la imagen resultante se puede obtener el píxel que corresponde a la mitad derecha con pocos cálculos más. Más aún, si se denomina}
@@ -45,13 +46,55 @@ se consigue
 \[ {I_{AB}}^{i,j} = P + {I_{A}}^{i,n - j + 1} \]
 y
 \[ {I_{AB}}^{i,n - j + 1} = -P + {I_{A}}^{i,j} \]
-y son menos cálculos necesarios.
+dando lugar a menos cálculos necesarios.
 
 \subsection{Código C}
 	
 \subsection{Código ASM}
-\par{}
-	
+\par{Dado que cada píxel tiene 4 bytes y los registros XMM tienen 16 bytes, se levantan 4 píxeles contiguos desde la posición $i,j$ y otros 4 píxeles desde la $i, n-j+1$ en otro registro.}
+\par{Se mostrará cómo se genera el píxel $I_{i,j}$ de la imagen resultante.}
+%\xmmb{$P_{j+3}A$}{$P_{j+3}R$}{$P_{j+3}G$}{$P_{j+3}B$}{$P_{j+2}A$}{$P_{j+2}R$}{$P_{j+2}G$}{$P_{j+2}B$}{$P_{j+1}A$}{$P_{j+1}R$}{$P_{j+1}G$}{$P_{j+1}B$}{$P_jA$}{$P_jR$}{$P_jG$}{$P_jB$}
+\par{Se levantan 4 píxeles de la mitad izquierda en el registro XMM1:}
+\par{\textbf{XMM1:}}
+\xmmb{$A_{j+3}$}{$R_{j+3}$}{$G_{j+3}$}{$B_{j+3}$}{$A_{j+2}$}{$R_{j+2}$}{$G_{j+2}$}{$B_{j+2}$}{$A_{j+1}$}{$R_{j+1}$}{$G_{j+1}$}{$B_{j+1}$}{$A_j$}{$R_j$}{$G_j$}{$B_j$}
+\par{y 4 en espejo de la mitad derecha en XMM3:}\\
+\par{\textbf{XMM3:}}
+\xmmb{$A_{n-j+4}$}{$R_{n-j+4}$}{$G_{n-j+4}$}{$B_{n-j+4}$}{$A_{n-j+3}$}{$R_{n-j+3}$}{$G_{n-j+3}$}{$B_{n-j+3}$}{$A_{n-j+2}$}{$R_{n-j+2}$}{$G_{n-j+2}$}{$B_{n-j+2}$}{$A_{n-j+1}$}{$R_{n-j+1}$}{$G_{n-j+1}$}{$B_{n-j+1}$}
+
+Teniendo
+\par{\textbf{XMM9:}}
+\xmmb{$0$}{$0$}{$0$}{$0$}{$0$}{$0$}{$0$}{$0$}{$0$}{$0$}{$0$}{$0$}{$0$}{$0$}{$0$}{$0$}
+se ejecuta la instrucción \textbf{punpcklbw xmm1, xmm9} que da como resultado
+\par{\textbf{XMM1:}}
+\xmmb{$0$}{$A_{j+1}$}{$0$}{$R_{j+1}$}{$0$}{$G_{j+1}$}{$0$}{$B_{j+1}$}{$0$}{$A_j$}{$0$}{$R_j$}{$0$}{$G_j$}{$0$}{$B_j$}
+\par{y luego \textbf{punpcklwd xmm1, xmm9} para seguir desempaquetando. De esta forma quedan 4 bytes para cada componente del píxel y se podrán convertir a floats para mayor precisión en los cálculos que implican el $\alpha$.}
+\par{\textbf{XMM1:}}
+\xmmb{$0$}{$0$}{$0$}{$A_j$}{$0$}{$0$}{$0$}{$R_j$}{$0$}{$0$}{$0$}{$G_j$}{$0$}{$0$}{$0$}{$B_j$}
+\par{Se copió el contenido de XMM1 a XMM10 y con el registro que contenía al píxel $n-j+4$, obtenido de forma análoga a como se obtuvo el píxel $j$}
+\par{\textbf{XMM8:}}
+\xmmb{$0$}{$0$}{$0$}{$A_{n-j+4}$}{$0$}{$0$}{$0$}{$R_{n-j+4}$}{$0$}{$0$}{$0$}{$G_{n-j+4}$}{$0$}{$0$}{$0$}{$B_{n-j+4}$}
+\par{se realizaron las restas entre componentes (\textbf{psubd xmm10, xmm8}) antes de convertir a float el registro XMM10 (\textbf{cvtdq2ps xmm10, xmm10}) dado que realizar la resta con float es una operación mucho más costosa que con enteros y además no había chances de perder precisión con la resta.}
+\par{\textbf{XMM10:}}
+\xmmdw{$A_j - A_{n-j+4}$}{$R_j - R_{n-j+4}$}{$G_j - G_{n-j+4}$}{$B_j - B_{n-j+4}$}
+\par{Se multiplicó por $\alpha$ al registro XMM10 (\textbf{mulps xmm10, xmm0}) y luego se dividió por $255.0$ (\textbf{divps xmm10, xmm14}) obteniéndose}
+\par{\textbf{XMM10:}}
+\xmmdw{$\dfrac{\alpha * (A_j - A_{n-j+4})}{255.0}$}{$\dfrac{\alpha * (R_j - R_{n-j+4})}{255.0}$}{$\dfrac{\alpha * (G_j - G_{n-j+4})}{255.0}$}{$\dfrac{\alpha * (B_j - B_{n-j+4})}{255.0}$}
+\par{Para esto previamente, fuera del ciclo, se había movido el $\alpha$ que había llegado en los últimos 4 bytes de XMM0 a las otras 3 double words del registro con la instrucción \textbf{pshufd xmm0, xmm0, 00000000b} y se había puesto en XMM14 un 255.0 en cada double word declarando \textbf{mascara255: dd 255.0, 255.0, 255.0, 255.0} en \textbf{section .rodata} y luego haciendo \textbf{movdqu xmm14, [mascara255]}. De esta forma, al realizar estas operaciones fuera del ciclo, se minimizan los accesos a memoria y se evita repetir operaciones innecesarias.}
+\par{Convirtiendo XMM8 a float con \textbf{cvtdq2ps xmm8, xmm8} y sumándolo a XMM10 con \textbf{addps xmm10, xmm8} se obtuvo}
+\par{\textbf{XMM10:}}
+\xmmdw{$\dfrac{\alpha * (A_j - A_{n-j+4})}{255.0} + A_{n-j+4}$}{$\dfrac{\alpha * (R_j - R_{n-j+4})}{255.0} + R_{n-j+4}$}{$\dfrac{\alpha * (G_j - G_{n-j+4})}{255.0} + G_{n-j+4}$}{$\dfrac{\alpha * (B_j - B_{n-j+4})}{255.0} + B_{n-j+4}$}
+\par{Antes de finalizar el procesamiento, se realizó \textbf{movups xmm15, xmm10} y \textbf{subps xmm15, xmm8} para conservar en XMM15 lo que en el desarrollo de cuentas apareció como P al explicar cómo se podían reutilizar cálculos.}
+\par{Por último en el procesamiento de la parte izquierda se convirtió a entero XMM10 con \textbf{cvtps2dq xmm10, xmm10} y se empaquetó con los resultados de los demás píxeles usando instrucciones como \textbf{packusdw xmm11, xmm10} y \textbf{packusdw xmm13, xmm12} para pasar de double word a word,}
+\par{\textbf{XMM11:}}
+\xmmw{${F_A}_j$}{${F_R}_j$}{${F_G}_j$}{${F_B}_j$}{${F_A}_{j+1}$}{${F_R}_{j+1}$}{${F_G}_{j+1}$}{${F_B}_{j+1}$}
+\par{luego \textbf{packuswb xmm13, xmm11} para pasar de word a byte,}
+\par{\textbf{XMM11:}}
+\xmmb{${F_A}_j$}{${F_R}_j$}{${F_G}_j$}{${F_B}_j$}{${F_A}_{j+1}$}{${F_R}_{j+1}$}{${F_G}_{j+1}$}{${F_B}_{j+1}$}{${F_A}_{j+2}$}{${F_R}_{j+2}$}{${F_G}_{j+2}$}{${F_B}_{j+2}$}{${F_A}_{j+3}$}{${F_R}_{j+3}$}{${F_G}_{j+3}$}{${F_B}_{j+3}$}
+\par{y finalmente \textbf{pshufd xmm11, xmm13, 0x1b} quedando todo listo para mover el contenido del registro a donde correspondiera.}
+\par{\textbf{XMM11:}}
+\xmmb{${F_A}_{j+3}$}{${F_R}_{j+3}$}{${F_G}_{j+3}$}{${F_B}_{j+3}$}{${F_A}_{j+2}$}{${F_R}_{j+2}$}{${F_G}_{j+2}$}{${F_B}_{j+2}$}{${F_A}_{j+1}$}{${F_R}_{j+1}$}{${F_G}_{j+1}$}{${F_B}_{j+1}$}{${F_A}_j$}{${F_R}_j$}{${F_G}_j$}{${F_B}_j$}
+\par{Para finalizar la parte derecha se multiplicaron todos los valores de las double words de XMM15 por -1 (\textbf{mulps xmm15, [menos1]} estando menos1 definido en \textbf{rodata} como \textbf{menos1: dd -1.0, -1.0, -1.0, -1.0}) y se prosiguió con las conversiones y sumas como anteriormente.}
+
 	
 \subsection{Experimentación}
 \subsubsection{Idea}	
