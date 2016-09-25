@@ -20,7 +20,7 @@ with open(data2_csv) as csvfile:
   for row in reader:
     sim = int(row['rotar'])
     
-    ts2[30].append(sim)
+    ts2[27].append(sim)
 
 
 
@@ -29,7 +29,7 @@ import numpy as np
 
 
 
-rotar = 100000000
+rotar = 100000000000000
 for i in range(128):
   for t in ts[i]:
     rotar = min(rotar, t)
@@ -37,7 +37,7 @@ for i in range(128):
 
 
 
-simd = 1000000
+simd = 10000000000000
 for i in range(128):
   for t in ts2[i]:
     simd = min(simd,t)
@@ -46,10 +46,8 @@ for i in range(128):
 
 
 y = []
-y.append(rotar)
+y.append(2*rotar)
 y.append(simd)
-
-
 
 ind = np.arange(2) 
 width = .75     
@@ -64,7 +62,7 @@ ax.set_xticklabels(('Con SIMD', 'Sin SIMD'))
 plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
 rects1[0].set_color('m')
 rects1[1].set_color('g')
-plt.ylim(275000,282000)
+plt.ylim(0,3200000)
 
 plt.show()
 
