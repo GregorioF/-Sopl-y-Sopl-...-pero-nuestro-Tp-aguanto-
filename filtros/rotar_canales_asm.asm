@@ -14,27 +14,29 @@ rotar_asm:
 	xor rax, rax
 	mov eax, edx	; en eax tengo la cnatidad de columnas
 	mul ecx			; en rax tengo la  cantidad d pilxeles totales
-
+	
+	.HacerMascaras:
+		pxor xmm4, xmm4
+		mov r8, 0x0f0c0e0d0b080a09 	; hago la mascara para shuffle
+		
+		movq xmm3, r8
+		pslldq xmm3, 8
+		mov r8, 0x0704060503000201
+		movq xmm4, r8
+		por xmm3, xmm4	 	; termine de hacer la mascara para shufle si el pixel x era = a|b|g|r ahora con shufle
+							; va a ser igual a  a|g|r|b
+		
 	.ciclo:
 		cmp rax,  0 
 		je .fin
-		mov r10, [rdi]	 ; subo a r10 2  pixeles
-		mov r11, r10
-		pslld r10, 2 ; |g|r|0|0
-		psrld r10, 1 ; 0|g|r|0
-		movq r9, r11
-		pslld r9, 1 ; a|b|g|r --> b|g|r|0
-		psrld r9, 3 ; b|g|r|0 --> 0|0|0|b
-		psrld r11, 3 ; a|b|g|r --> 0|0|0|a
-		pslld r11, 3 ; 0|0|0|a --> a|0|0|0
-		paddb r11, r9 ; a|0|0|b
-		paddb r10, r11 ; a|g|r|b
+		movdqu xmm0, [rdi]	 ; subo a xmm0 4  pixeles
+		pshufb xmm0, xmm3	; shufleee!
+		;psrldq xmm0, 1
+		movdqu [rsi], xmm0	; reescribo y lesto
 		
-		movq [rsi], r10	; reescribo y lesto
-		
-		sub rax, 2			; procese ya cuatro pixeles
-		add rdi, 8
-		add rsi, 8
+		sub rax, 4			; procese ya cuatro pixeles
+		add rdi, 16
+		add rsi, 16
 		jmp .ciclo
 			
 	.fin:

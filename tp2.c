@@ -17,7 +17,7 @@ int romperCache(){
 		res = res +a[i];
 		i+=1;
 	}
-	return res;		
+	return res; 	
 }
 
 // ~~~ seteo de los filtros ~~~
@@ -43,7 +43,7 @@ filtro_t filtros[] = {
 	{0,0,0,0,0}
 };
 
-char* name = "smalltiles.csv";
+char* name = "rotar.csv";
 
 // ~~~ fin de seteo de filtros. Para agregar otro debe agregarse ~~~
 //    ~~~ una linea en cada una de las tres partes anteriores ~~~
