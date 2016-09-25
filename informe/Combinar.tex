@@ -49,6 +49,56 @@ y
 dando lugar a menos cálculos necesarios.
 
 \subsection{Código C}
+
+\begin{algorithm}[h!]
+\caption{clamp}
+\begin{algorithmic}
+  \Function{clamp}{pixel: float}  $\to$ : \texttt{float}
+	\If{$pixel < 0.0$}
+		\State \Return $0.0$
+	\Else
+		\If{$pixel > 255.0$}
+			\State \Return $255.0$
+		\Else
+			\State \Return $pixel$
+		\EndIf
+	\EndIf
+\EndFunction
+\end{algorithmic} 
+\end{algorithm}
+
+\begin{algorithm}[h!]
+\caption{combine}
+\begin{algorithmic}
+  \Function{combine}{a: unsigned char, b: unsigned char, $\alpha$: float}  $\to$ : \texttt{float}
+	\State float $af \gets a$
+	\State float $bf \gets b$
+	\State \Return $\dfrac{\alpha * (af - bf)}{255.0} + bf$
+\EndFunction
+\end{algorithmic} 
+\end{algorithm}
+
+void combinar_c (unsigned char *src, unsigned char *dst, int cols, int filas, int src_row_size, int dst_row_size,float alpha) {
+	unsigned char (*src_matrix)[src_row_size] = (unsigned char (*)[src_row_size]) src;
+	unsigned char (*dst_matrix)[dst_row_size] = (unsigned char (*)[dst_row_size]) dst;
+
+	for(int f = 0; f<filas; f++){
+		for(int c = 0; c<cols; c++){
+
+			bgra_t *p_sa = (bgra_t*) &src_matrix[f][c * 4];
+			bgra_t *p_sb = (bgra_t*) &src_matrix[f][(cols - c -1) * 4];
+			bgra_t *p_d = (bgra_t*) &dst_matrix[f][c * 4];
+
+
+			p_d->b = clamp(combine(p_sa->b, p_sb->b, alpha));
+			p_d->g = clamp(combine(p_sa->g, p_sb->g, alpha));
+			p_d->r = clamp(combine(p_sa->r, p_sb->r, alpha));
+			p_d->a = clamp(combine(p_sa->a, p_sb->a, alpha));
+
+		}
+	}
+}
+
 	
 \subsection{Código ASM}
 \par{Dado que cada píxel tiene 4 bytes y los registros XMM tienen 16 bytes, se levantan 4 píxeles contiguos desde la posición $i,j$ y otros 4 píxeles desde la $i, n-j+1$ en otro registro.}
