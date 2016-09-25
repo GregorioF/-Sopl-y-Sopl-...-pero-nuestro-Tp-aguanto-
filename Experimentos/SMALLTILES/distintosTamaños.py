@@ -1,26 +1,26 @@
 import csv
 
-data_csv = "smalltiles400x800.csv"
+data_csv = "smalltiles320x1000.csv"
 
 ts = [ [] for i in range(128)]
 
 with open(data_csv) as csvfile:
   reader = csv.DictReader(csvfile)
   for row in reader:
-    smal48 = int(row['small'])
+    smal31 = int(row['small'])
     
-    ts[30].append(smal48)
+    ts[45].append(smal31)
 
-data2_csv = "smalltiles800x400.csv"
+data2_csv = "smalltiles1000x320.csv"
 
 ts2 = [ [] for i in range(128)]
 
 with open(data2_csv) as csvfile:
   reader = csv.DictReader(csvfile)
   for row in reader:
-    smal84 = int(row['small'])
+    smal13 = int(row['small'])
     
-    ts2[30].append(smal84)
+    ts2[29].append(smal13)
 
 data3_csv = "smalltiles200x1600.csv"
 ts3 = [ [] for i in range(128)]
@@ -64,20 +64,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-small48 = 100000000
+small31 = 10000000000000000000
 for i in range(128):
   for t in ts[i]:
-    small48 = min(small48, t)
+    small31 = min(small31, t)
 
 
-small84 = 1000000
+small13 = 1000000000000000000
 for i in range(128):
   for t in ts2[i]:
-    small84 = min(small84,t)
-
-
-
-
+    small13 = min(small13,t)
 
 small21 = 1000000000000000
 for i in range(128):
@@ -103,12 +99,15 @@ for i in range(128):
 
 
 y = []
-y.append(small48)
-y.append(small84)
-y.append(small56)
+
+print(small56 - small65)
+
 y.append(small65)
-y.append(small21)
+y.append(small56)
+y.append(small13)
+y.append(small31)
 y.append(small12)
+y.append(small21)
 
 
 ind = np.arange(6) 
@@ -118,10 +117,10 @@ fig, ax = plt.subplots()
 rects1 = ax.bar(ind, y, width)
 
 ax.set_ylabel('Ciclos')
-ax.set_title('       Diferencias de Smalltiles ASM con 320000 pixeles')
+ax.set_title('       Diferencias de Smalltiles ASM con imagenes de 320000 pixeles')
 #ax.set_subtitle(' formas e igual cantidad de pixeles')
 ax.set_xticks(ind + 0.4)
-ax.set_xticklabels(('400x800','800x400','500x640','640x500','200x1600','1600x200'))
+ax.set_xticklabels(('640x500','500x640','1000x320','320x1000','1600x200','200x1600'))
 plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
 rects1[0].set_color('k')
 rects1[1].set_color('y')
@@ -130,7 +129,7 @@ rects1[3].set_color('g')
 rects1[4].set_color('m')
 rects1[5].set_color('r')
 
-plt.ylim(200000,3280000)
+plt.ylim(2500000,3300000)
 
 plt.show()
 
