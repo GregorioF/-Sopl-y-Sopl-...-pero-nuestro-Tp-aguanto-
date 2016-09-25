@@ -49,15 +49,14 @@ combinar_asm:
 	mov rax, rdx ; muevo el ancho de las filas (en píxeles) a rax
 	xor rdx, rdx ; rdx == 0
 	mov rbx, 8
-	div rbx ; divido por 8. Queda en eax el cociente de la división y en rdx el resto.
+	div rbx ; divido por 8. Queda en rax el cociente de la división y en rdx el resto.
 
 .cicloExterno:
 		cmp r10, rcx ; comparo r10 con la cantidad de filas
 		je .fin ; si es igual ya terminó de recorrer la matriz y salto al final
 		xor r9, r9  ; si no, pongo un 0 en el contador de columnas y voy al ciclo Interno
-		xor rbx, rbx
-		mov rbx, 0
-		mov r14, r9
+		xor rbx, rbx ; rbx == 0
+		mov r14, r9 ; r14 == 0
 		mov r11, rdi ; r11 == rdi
 		add r11, r8 ; r11 == rdi + tamaño de la fila
 		sub r11, 16 ; r11 == rdi + tamaño de la fila - 16
@@ -66,15 +65,12 @@ combinar_asm:
 		sub r12, 16 ; r12 == rsi + tamaño de la fila - 16
 
 			.cicloInterno:
-					cmp rbx, rax ; comparo r9 con la cantidad de veces que entran 8 píxeles, con el cociente de la división.
+					cmp rbx, rax ; comparo rbx con la cantidad de veces que entran 8 píxeles, con el cociente de la división.
 					je .QuizasFaltaProcesar ; si no es igual falta procesar píxeles en esa fila
 					movdqu xmm1, [rdi + 4*r9] ; agarro 4 píxeles de la mitad izquierda de la foto		; xmm1 = p3|p2|p1|p0
 					movdqu xmm2, xmm1
-					;===============0000
-					mov r15, r14
-					imul r15, 4
-					;===============0000
-					movdqu xmm3, [r11 + r15] ; agarro 4 píxeles de la mitad derecha de la foto		; xmm3 = p7|p6|p5|p4
+
+					movdqu xmm3, [r11 + 4*r14] ; agarro 4 píxeles de la mitad derecha de la foto		; xmm3 = p7|p6|p5|p4
 					movdqu xmm4, xmm3
 					punpcklbw xmm1, xmm9 ; | 0 | píxel 1 a | 0 | píxel 1 r | 0 | píxel 1 g | 0 | píxel 1 b | 0 | píxel 0 a | 0 | píxel 0 r | 0 | píxel 0 g | 0 | píxel 0 b |
 					punpckhbw xmm2, xmm9 ; | 0 | píxel 3 a | 0 | píxel 3 r | 0 | píxel 3 g | 0 | píxel 3 b | 0 | píxel 2 a | 0 | píxel 2 r | 0 | píxel 2 g | 0 | píxel 2 b |
@@ -185,17 +181,13 @@ combinar_asm:
 					packuswb xmm7, xmm8 ; empaqueto de w a b, xmm7 == pixel 0, pixel 1, pixel 2, pixel 3
 
 ; ============ Pongo en la imagen destino en la mitad derecha de la imagen =======================
-					;====000
-					mov r15, r14
-					imul r15, 4
-					;====000
-					movdqu [r12 + r15], xmm7
+					movdqu [r12 + 4*r14], xmm7
 
 					add r9, 4 ; como cada vez se procesan 4 píxeles de la imagen destino, se avanzan 4 columnas
 					mov r14, r9
 					imul r14, -1
 					add rbx, 1
-					cmp rbx, rax ; comparo r9 con la cantidad de veces que entran 8 píxeles, con el cociente de la división
+					cmp rbx, rax ; comparo rbx con la cantidad de veces que entran 8 píxeles, con el cociente de la división
 					jne .cicloInterno ; si no es igual falta procesar píxeles en esa fila
 
 .QuizasFaltaProcesar:
@@ -211,9 +203,7 @@ combinar_asm:
 .faltaProcesar:					; quedan 4 píxeles en el medio que falta procesar
 		movdqu xmm1, [rdi + 4*r9] ; agarro 4 píxeles de la mitad izquierda de la foto		; xmm1 = p3|p2|p1|p0
 		movdqu xmm2, xmm1
-		;===============0000
 
-		;===============0000
 		punpcklbw xmm1, xmm9 ; | 0 | píxel 1 a | 0 | píxel 1 r | 0 | píxel 1 g | 0 | píxel 1 b | 0 | píxel 0 a | 0 | píxel 0 r | 0 | píxel 0 g | 0 | píxel 0 b |
 		punpckhbw xmm2, xmm9 ; | 0 | píxel 3 a | 0 | píxel 3 r | 0 | píxel 3 g | 0 | píxel 3 b | 0 | píxel 2 a | 0 | píxel 2 r | 0 | píxel 2 g | 0 | píxel 2 b |
 
@@ -272,7 +262,7 @@ combinar_asm:
 		packusdw xmm13, xmm12 ; empaqueto de dw a w, xmm13 == pixel de xmm12, es decir, el pixel 2, seguido del pixel de xmm13, el 3
 		packusdw xmm11, xmm10 ; empaqueto de dw a w, xmm11 == pixel de xmm10, es decir, el pixel 0, seguido del pixel de xmm11, el 1
 		packuswb xmm13, xmm11 ; empaqueto de w a b, xmm13 == pixel 0, pixel 1, pixel 2, pixel 3
-		pshufd xmm11, xmm13, 0x1b		; esto porque tienen q ser al revez la de un lado a la del otro!
+		pshufd xmm11, xmm13, 0x1b		; esto porque tienen q ser al revés la de un lado a la del otro!
 
 		; ============ Pongo en la imagen destino en la mitad izquierda de la imagen =======================
 		movdqu [rsi + 4*r9], xmm11

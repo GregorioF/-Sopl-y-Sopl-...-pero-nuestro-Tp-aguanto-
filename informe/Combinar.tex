@@ -49,11 +49,12 @@ y
 dando lugar a menos cálculos necesarios.
 
 \subsection{Código C}
-
+\par{A continuación se presenta el pseudocódigo detallado del filtro.}
+\par{Clamp es una función que controla la saturación.}
 \begin{algorithm}[h!]
-\caption{clamp}
+\caption{Clamp}
 \begin{algorithmic}
-  \Function{clamp}{pixel: float}  $\to$ : \texttt{float}
+  \Function{clamp}{$pixel: ~float$}  $\to \texttt{float}$
 	\If{$pixel < 0.0$}
 		\State \Return $0.0$
 	\Else
@@ -67,10 +68,11 @@ dando lugar a menos cálculos necesarios.
 \end{algorithmic} 
 \end{algorithm}
 
+\par{Combine realiza los cálculos correspondientes determinados por el filtro.}
 \begin{algorithm}[h!]
-\caption{combine}
+\caption{Combine}
 \begin{algorithmic}
-  \Function{combine}{a: unsigned char, b: unsigned char, $\alpha$: float}  $\to$ : \texttt{float}
+  \Function{combine}{$a: ~unsigned~ char, ~b: ~unsigned~ char, ~\alpha: ~float$}  $\to \texttt{float}$
 	\State float $af \gets a$
 	\State float $bf \gets b$
 	\State \Return $\dfrac{\alpha * (af - bf)}{255.0} + bf$
@@ -78,27 +80,27 @@ dando lugar a menos cálculos necesarios.
 \end{algorithmic} 
 \end{algorithm}
 
-void combinar_c (unsigned char *src, unsigned char *dst, int cols, int filas, int src_row_size, int dst_row_size,float alpha) {
-	unsigned char (*src_matrix)[src_row_size] = (unsigned char (*)[src_row_size]) src;
-	unsigned char (*dst_matrix)[dst_row_size] = (unsigned char (*)[dst_row_size]) dst;
-
-	for(int f = 0; f<filas; f++){
-		for(int c = 0; c<cols; c++){
-
-			bgra_t *p_sa = (bgra_t*) &src_matrix[f][c * 4];
-			bgra_t *p_sb = (bgra_t*) &src_matrix[f][(cols - c -1) * 4];
-			bgra_t *p_d = (bgra_t*) &dst_matrix[f][c * 4];
-
-
-			p_d->b = clamp(combine(p_sa->b, p_sb->b, alpha));
-			p_d->g = clamp(combine(p_sa->g, p_sb->g, alpha));
-			p_d->r = clamp(combine(p_sa->r, p_sb->r, alpha));
-			p_d->a = clamp(combine(p_sa->a, p_sb->a, alpha));
-
-		}
-	}
-}
-
+\par{Combinar llama a las dos funciones ya explicadas y obtiene 2 píxeles con los que operar para luego dejar el resultado en la imagen destino.}
+\begin{algorithm}[h!]
+\caption{Combinar}
+\begin{algorithmic}
+  \Function{combinar}{src: *unsigned char, dst: *unsigned char, cols: int, filas: int, srcRowSize: int, dstRowSize: int, $\alpha$: float}
+	\State $unsigned~ char~ (*srcMatrix)[srcRowSize] = (unsigned~ char (*)[srcRowSize])~ src$
+	\State $unsigned~ char~ (*dstMatrix)[dstRowSize] = (unsigned~ char (*)[dstRowSize])~ dst$
+	\For{$f \gets 0~..~filas-1$}
+		\For{$c \gets 0~..~cols-1$}
+			\State $bgra_t* p_{sa} \gets (bgra_t*)$ \& $srcMatrix[f][c * 4]$
+			\State $bgra_t* p_{sb} \gets (bgra_t*)$ \&$srcMatrix[f][(cols - c -1) * 4]$
+			\State $bgra_t *p_d \gets (bgra_t*)$ \&$dstMatrix[f][c * 4]$
+			\State $p_d$->$b \gets$ \Call{clamp}{\Call{combine}{$p_{sa}$->$b$, $p_{sb}$->$b, \alpha$}}
+			\State $p_d$->$g \gets$ \Call{clamp}{\Call{combine}{$p_{sa}$->$g, p_{sb}$->$g, \alpha$}}
+			\State $p_d$->$r \gets$ \Call{clamp}{\Call{combine}{$p_{sa}$->$r, p_{sb}$->$r, \alpha$}}
+			\State $p_d$->$a \gets$ \Call{clamp}{\Call{combine}{$p_{sa}$->$a, p_{sb}$->$a, \alpha$}}
+		\EndFor
+	\EndFor
+\EndFunction
+\end{algorithmic} 
+\end{algorithm}
 	
 \subsection{Código ASM}
 \par{Dado que cada píxel tiene 4 bytes y los registros XMM tienen 16 bytes, se levantan 4 píxeles contiguos desde la posición $i,j$ y otros 4 píxeles desde la $i, n-j+1$ en otro registro.}
