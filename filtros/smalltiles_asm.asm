@@ -17,6 +17,8 @@ smalltiles_asm:
 	sub rsp, 8
 	sub rsp, 8
 	push r12
+	push r13
+
 
 	mov rax, rdx   
 	shr rax,1
@@ -78,7 +80,15 @@ smalltiles_asm:
 
 				add r8, 8							; lo avanzo cuatro numeros
 				add r11, 4							; imprimi cuatro pixeles en cada imagen
-				cmp r8, rdx							; 
+				
+				mov r13, r8
+				add r13, 4
+				cmp r13, rdx							; 
+				je .procesoLos4Faltantes
+
+				.sigo:
+
+				cmp r8, rdx
 				jne .ciclo2
 
 				add r9, 2
@@ -89,8 +99,15 @@ smalltiles_asm:
 
 
 	.fin:
+		pop r13
 		pop r12
 		add rsp, 8
 		add rsp,8
 		pop rbp
 		ret
+
+.procesoLos4Faltantes:
+
+				sub r8, 4
+				sub r11, 2
+				jmp .sigo
