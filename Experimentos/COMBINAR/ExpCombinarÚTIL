@@ -1,0 +1,54 @@
+Filtro             : combinar
+Implementación     : ASM
+Archivo de entrada : lena.bmp
+Tiempo de ejecución:
+Comienzo                          : 56204196203358
+Fin                               : 56205365796100
+# iteraciones                     : 1000
+# de ciclos insumidos totales     : 1169592742
+# de ciclos insumidos por llamada : 1169592.750
+
+
+
+Filtro             : combinar
+Implementación     : C - O0
+Archivo de entrada : lena.bmp
+Tiempo de ejecución:
+Comienzo                          : 56024354476653
+Fin                               : 56058197843712
+# iteraciones                     : 1000
+# de ciclos insumidos totales     : 33843367059
+# de ciclos insumidos por llamada : 33843368.000
+
+
+  Filtro             : combinar
+  Implementación     : C - O2
+  Archivo de entrada : lena.bmp
+Tiempo de ejecución:
+  Comienzo                          : 55131067680546
+  Fin                               : 55145015728791
+  # iteraciones                     : 1000
+  # de ciclos insumidos totales     : 13948048245
+  # de ciclos insumidos por llamada : 13948048.000
+
+
+  Filtro             : combinar
+Implementación     : C - O3
+Archivo de entrada : lena.bmp
+Tiempo de ejecución:
+Comienzo                          : 55491430472424
+Fin                               : 55503446792436
+# iteraciones                     : 1000
+# de ciclos insumidos totales     : 12016320012
+# de ciclos insumidos por llamada : 12016321.000
+
+
+Filtro             : combinar
+Implementación     : C - O4
+Archivo de entrada : lena.bmp
+Tiempo de ejecución:
+Comienzo                          : 55711103439318
+Fin                               : 55723121995220
+# iteraciones                     : 1000
+# de ciclos insumidos totales     : 12018555902
+# de ciclos insumidos por llamada : 12018556.000
