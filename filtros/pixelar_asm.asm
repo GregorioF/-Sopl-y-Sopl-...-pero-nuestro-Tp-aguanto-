@@ -25,7 +25,7 @@ pixelar_asm:
 	pxor xmm10, xmm10	; foward clean
 
 	mov rax, rdx
-	mov r8, 2
+	mov r8, 4
 	mul r8		; tengo en r8 el tamaño de fila
 	mov r8, rax
 
@@ -36,7 +36,7 @@ pixelar_asm:
 
 		.ciclo2:
 			mov rax, r9
-			mov r10, 2
+			mov r10, 4
 			mul r10
 			mov r10, rax									;Lo que hice fue poner en que columna estoy y le multiplico el tamaño de las unidades
 			movdqu xmm0, [rdi+r10]			; tengo en xmm0 la linea superior de los pixeles sobre los  q voy a trabajar
@@ -85,7 +85,7 @@ pixelar_asm:
 			packuswb xmm0, xmm3 		; en xmm0 tengo el resultado final
 
 			mov rax, r9
-			mov r10, 2
+			mov r10, 4
 			mul r10
 			mov r10,rax							; multiplico r10 porq el tamaño de los bgra
 			movdqu [rsi+r10], xmm0
