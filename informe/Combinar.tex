@@ -8,12 +8,12 @@
 \centering
 \begin{minipage}{.5\textwidth}
 \centering
-\includegraphics[width=5cm, height=5cm]{CombinarOriginal.jpg}
+\includegraphics[width=5cm, height=5cm]{imagenes/CombinarOriginal.jpg}
 \label{}
 \end{minipage}\hfill
 \begin{minipage}{.5\textwidth}
 \centering
-\includegraphics[width=5cm, height=5cm]{CombinarReflejo.jpg}
+\includegraphics[width=5cm, height=5cm]{imagenes/CombinarReflejo.jpg}
 \label{}
 \end{minipage}
 \caption[center]{Se muestra la imagen $A$ del lado izquierdo con la imagen $B$, el reflejo vertical de A, en la parte derecha.}
@@ -149,10 +149,33 @@ se ejecuta la instrucción \textbf{punpcklbw xmm1, xmm9} que da como resultado
 
 	
 \subsection{Experimentación}
-\subsubsection{Idea}	
 
 \subsubsection{Hipótesis}
-	
-	
+\par{Nuestra hipótesis era que la implementación en ASM iba a ser mucho más veloz que la de C con el menor nivel de optimización al compilar e incluso que las de C con mayores niveles de optimización.}
+\par{Además creíamos que las ejecuciones con la implementación de C iban a presentar un porcentaje de ciclos de clock debidos accesos a memoria mucho mayor que la implementación de ASM.}
+
+\subsubsection{Idea}
+\par{Como forma de verificar esto pensamos medir la cantidad de ciclos de clock insumidos en cada caso para la ejecución del filtro. Se realizaron 1000 mediciones y se realizó un gráfico de barras con los promedios obtenidos de dividir cada total de ciclos por la cantidad de iteraciones.}
+\par{Por otro lado, se midieron los ciclos de clock relacionados a accesos a memoria con la implementación de ASM y con la de C y se realizaron gráficos de torta para mostrar los porcentajes con respecto al total de ciclos insumidos.}
+
 \subsubsection{Resultados}
-	
+\par{En cuanto a las cantidades totales de ciclos de clock se obtuvo el siguiente gráfico.}
+
+\begin{figure}[h!]
+\centering
+	\includegraphics[width = 12 cm, height = 8 cm]{imagenes/CombinarASM-Cs.jpeg}
+\end{figure}
+
+\par{Como se puede apreciar, la implementación de ASM es casi 29 veces más rápida que la menos optimizada de C y también supera ampliamente a las optimizadas, siendo más de 10 veces más rápida. Esto confirma nuestras suposiciones de la mejoría resultante del modelo de procesamiento SIMD.}
+
+\medskip
+
+\par{Con respecto a lo planteado en cuanto a los accesos a memoria, también obtuvimos resultados esperados, visibles en la siguiente figura.}
+
+\begin{figure}[h!]
+\centering
+	\includegraphics[width = 12 cm, height = 8 cm]{imagenes/CombinarMemoria.png}
+\end{figure}
+
+\par{A simple vista se observa que la implementación de ASM da como resultado que la mayor parte del tiempo de ejecución esté destinada al procesamiento de la imagen, al contrario de lo que ocurre con la implementación de C que resulta en un mayor consumo de ciclos por parte de los accesos a memoria.
+\par{Más aún, el cociente entre el procesamiento de píxeles y los accesos a memoria para la implementación de ASM da 5,5, es decir que cada 13 ciclos, 11 surgen del procesamiento y 2 de los accesos. En cambio, este cociente es 0,68 para la implementación en C, de modo que la diferencia entre ambas implementaciones en cuanto al uso de la memoria y del procesador es muy significativa.}
