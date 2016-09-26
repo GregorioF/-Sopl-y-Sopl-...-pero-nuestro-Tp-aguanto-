@@ -13,7 +13,7 @@ int romperCache(){
 	int* a=malloc(4*100000);
 	int i =0;
 	int res = 0;
-	while(i < 400000){
+	while(i < 40000){
 		res = res +a[i];
 		i+=1;
 	}
