@@ -43,7 +43,7 @@ filtro_t filtros[] = {
 	{0,0,0,0,0}
 };
 
-char* name = "pixelarRompiendo.csv";
+char* name = "pixelar.csv";
 
 // ~~~ fin de seteo de filtros. Para agregar otro debe agregarse ~~~
 //    ~~~ una linea en cada una de las tres partes anteriores ~~~
@@ -125,7 +125,7 @@ void correr_filtro_imagen(configuracion_t *config, aplicador_fn_t aplicador, uns
 	else
 	{
 		imagenes_abrir(config);
-		int tuvi = romperCache();
+		//int tuvi = romperCache();
 		unsigned long long start, end;
 		MEDIR_TIEMPO_START(start)
 		for (int i = 0; i < config->cant_iteraciones; i++) {
