@@ -43,7 +43,7 @@ filtro_t filtros[] = {
 	{0,0,0,0,0}
 };
 
-char* name = "rotar.csv";
+char* name = "pixelarRompiendo.csv";
 
 // ~~~ fin de seteo de filtros. Para agregar otro debe agregarse ~~~
 //    ~~~ una linea en cada una de las tres partes anteriores ~~~
@@ -108,7 +108,7 @@ void imprimir_tiempos_ejecucion(unsigned long long int start, unsigned long long
 	printf("  # de ciclos insumidos totales     : %llu\n", cant_ciclos);
 	printf("  # de ciclos insumidos por llamada : %.3f\n", (float)cant_ciclos/(float)cant_iteraciones);
 	*total = *total + cant_ciclos;
-	fprintf(pFile,"%llu\n", cant_ciclos);
+	fprintf(pFile,"%.3f\n", (float)cant_ciclos/(float)cant_iteraciones);
 	fclose( pFile );
 }
 
@@ -125,7 +125,7 @@ void correr_filtro_imagen(configuracion_t *config, aplicador_fn_t aplicador, uns
 	else
 	{
 		imagenes_abrir(config);
-		//int tuvi = romperCache();
+		int tuvi = romperCache();
 		unsigned long long start, end;
 		MEDIR_TIEMPO_START(start)
 		for (int i = 0; i < config->cant_iteraciones; i++) {
