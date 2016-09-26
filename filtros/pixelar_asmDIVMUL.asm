@@ -24,8 +24,10 @@ section .text
 pixelar_asm:
 	pxor xmm10, xmm10	; foward clean
 
-	mov r8, rdx
-	shl r8, 2		; tengo en r8 el tamaño de fila
+	mov rax, rdx
+	mov r8, 4
+	mul r8		; tengo en r8 el tamaño de fila
+	mov r8, rax
 
 	.ciclo:
 		mov r9, 0		; en r9 voy a llevar mi current sobre columnas
@@ -33,8 +35,10 @@ pixelar_asm:
 		je .fin
 
 		.ciclo2:
-			mov r10, r9
-			shl r10, 2									;Lo que hice fue poner en que columna estoy y le multiplico el tamaño de las unidades
+			mov rax, r9
+			mov r10, 4
+			mul r10
+			mov r10, rax									;Lo que hice fue poner en que columna estoy y le multiplico el tamaño de las unidades
 			movdqu xmm0, [rdi+r10]			; tengo en xmm0 la linea superior de los pixeles sobre los  q voy a trabajar
 			add r10, r8 								; esta operacion es para acceder a los pixeles de la linea inferior
 			movdqu xmm1, [rdi+r10]			; tengo en xmm1 la linea inferior de los pixeles sobre los q voy a trabajar
@@ -80,8 +84,10 @@ pixelar_asm:
 
 			packuswb xmm0, xmm3 		; en xmm0 tengo el resultado final
 
-			mov r10, r9
-			shl r10, 2							; multiplico r10 porq el tamaño de los bgra
+			mov rax, r9
+			mov r10, 4
+			mul r10
+			mov r10,rax							; multiplico r10 porq el tamaño de los bgra
 			movdqu [rsi+r10], xmm0
 			add r10, r8
 			movdqu [rsi+r10], xmm0
