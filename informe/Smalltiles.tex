@@ -41,8 +41,18 @@ Este filtro consiste en replicar 4 veces la imagen original achicada. De esta ma
 	
 \subsection{Código ASM}
 	
-	
-	
+	En la implementación de ASM recorremos las filas de la imagen; tenemos dos ciclos, el interno recorre una fila iterando sobre sus columnas, y el externo itera sobre todas las filas de la imagen.\\
+	En el ciclo interno cargamos 8 píxeles, nos encargamos de ubicarlos en un registro xmmi a nuestra conveniencia utilizando \textbf{pshufd}, \textbf{psrldq}, \textbf{pslldq} y \textbf{paddb}.\\
+	En un principio cargamos los primeros 4 píxeles en \textbf{xmm1} y luego \textbf{pshud xmm1, xmm1,0xd8}. \\
+	\textbf{xmm1:}
+	\xmmdw{$pixel4$}{$pixel2$}{$pixel3$}{$pixel1$}
+	Luego cargamos los siguientes 4 píxeles en xmm10 y también \textbf{pshud xmm10,xmm10, 0x2d}.\\
+	\textbf{xmm10:}
+	\xmmdw{$pixel5$}{$pixel7$}{$pixel8$}{$pixel6$}
+	Luego shifteamos convenientemente y sumamos los xmmi.\\
+	\textbf{xmm10:}
+	\xmmdw{$pixel8$}{$pixel6$}{$pixel4$}{$pixel2$}
+	Ya tenemos en \textbf{xmm10} la información tal cual queremos guardarla, ahora simplemente la guardamos en memoria manipulando algunos ínidices para cargarla en los 4 cuadrantes de la imagen destino.
 \subsection{Experimentación}
 
 \subsubsection{Idea}
@@ -59,11 +69,12 @@ Nuestra implementación de ASM consiste en un ciclo que itera sobre las filas, p
 \caption[center]{Gráfico de barras que da cuenta de los ciclos que implica cada corrida del filtro para imágenes de distintos tamaños con una determinada cantidad fija de píxeles.}
 \end{figure}
 	
+	\newpage
 	A continuación adjuntamos el gráfico que compara la cantidad de ciclos que tarda en ejecutarse el filtro implementado en ASM y el implementado en C.
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 15 cm, height = 8 cm]{imagenes/ASMvsCSmalltiles.png}
+\includegraphics[width = 15 cm, height = 12 cm]{imagenes/ASMvsCSmalltiles.png}
 \caption[center]{Comparación de las implementaciones y compilaciones con distintos niveles de optimización en cuanto a la rapidez para el procesamiento de una imagen.}
 \end{figure}
 	
