@@ -1,25 +1,60 @@
 \section{Colorizar}
 
 \subsection{Código C}
-	El código C se trata de una conjuncion de Fors, el exterior que recorre desde la segunda fila hasta la ante ultima,  y el interior que recorre desde la segunda columna hasta la ultima, dejando asi afuera a todos los bordes, tal como el enunciado decia. Luego en cada iteracion del ciclo interior, que es donde se hace las opearciones que modifican la imagen, lo que hacemos es crear un arreglo de unsinged chars, "res", que es  donde guardamos los maximos de cada canal en comparacion a todos  los pixeles lindantes del pixel en el cual estemos parado.
+	El código C se trata de una conjuncion de ciclos, el exterior que recorre desde la segunda fila hasta la ante ultima,  y el interior que recorre desde la segunda columna hasta la ultima, dejando asi afuera a todos los bordes, tal como el enunciado pedia. \\ Luego en cada iteracion del ciclo interior, que es donde se hace las opearciones que modifican la imagen, lo que hacemos es crear un arreglo de unsinged chars, "res", que es  donde guardamos los maximos de cada canal en comparacion a todos  los pixeles lindantes del pixel en el cual estemos parado (una matriz de 3x3).
 \begin{itemize}
 \item {Res $[$0$]$ $\leftarrow$ MaximoLindantesAzul}
 \item {Res $[$1$]$ $\leftarrow$ MaximoLindantesVerde}
 \item {Res $[$2$]$ $\leftarrow$ MaximoLindantesRojo}
 \end{itemize}
-Luego con estos tres valores calculamos el alpha correspondiente de cada canal por el cual voy a multiplicar a cada uno. Y por ultimo reescribimos el pixel final, en la imagen source con cada canal multiplicado  por dicho alpha.
+Luego con estos tres valores calculamos el alpha correspondiente de cada canal por el cual voy a multiplicar a cada uno. Y por ultimo reescribimos el pixel final, en la imagen src con cada canal multiplicado  por dicho alpha.
 
 \subsection{Código ASM}
-	El código en ASM se trata tambien de una conjuncion de ciclos. El recorre las filas desde la segunda hasta la anteUltima, y el interior recorre las columnas desde la segunda hasta la anteultima, pero saltando de a dos pixeles, que es la cantidad que procesamos simultaneamente con instruccciones SSE. 
-    El ciclo interior consta de tres partes, la primera es tan pronto se levanta de memoria los pixeles a procesar y todos sus lindantes, calculamos en dos registros los maximos de cada canal, de ambos pixeles a procesar con respecto a todos sus lindantes, y los guardamos ambos en un registro xmm. Luego la segunda parte es calcular el maximo de los maximos de ambos al mismo tiempo. Luego atravez de una par de operaciones, muy especificas para explicar, logro tener un registro xmm de dw, con cada dw representando un canal de cada pixel, en el orden establecido (argb), donde tengo un 1-alpha en la posicion del canal que no teine el maximo de los maximos, y un 1+alpha en la posicion que tiene al maximo de los maximos, y luego concluyo multiplicando a cada pixel por su registro con los alphas indicados, lo reduzco a tamaño de 32 bits por pixel, los uno y los escribo en el destino.
+	El código en ASM se trata tambien de una conjuncion de ciclos. El recorre las filas desde la segunda hasta la ante ultima, y el interior recorre las columnas desde la segunda hasta la ante ultima, pero saltando de a dos pixeles, que es la cantidad que procesamos simultaneamente con instruccciones SSE. \\
+	El ciclo interior consta de dos partes, la primera es calcular un registro en el que en las primeras dos DW guardamos los maximos valores de cada canal entre los pixeles lindantes, en sus posiciones respectivas. Se veria asi:\\
+\ Vamos a hacer referencia como "fruta" cuando un byte tenga informacion que no nos interesa.
+\par{\textbf{XMM1:}}
+\xmmb{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$A_M{p2}$}{$R_M{p2}$}{$G_M{p2}$}{$B_M{p2}$}{$A_M{p1}$}{$R_M{p1}$}{$G_M{p1}$}{$B_M{p1}$}
+	
+ Luego con esta informacion lo que hacemos es duplicar dicho registro y calcular el maximo de los maximos. Lo que hacemos para lograr esto es al registro duplicado	 lo shifteamos un lugar para la derecha, cosa de poder ir comparando entre ellos a los valores maximos de cada canal, y finalmente reproducimos el valor del maximo entre los maximos en todas las posiciones. El seguimiento de esta operacion seria la siguiente: 
+\\Vamos a utilizar para esto los registros xmm1, y xmm2
+\\
+\par{\textbf{XMM2:}}
+\xmmb{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$A_M{p2}$}{$R_M{p2}$}{$G_M{p2}$}{$B_M{p2}$}{$A_M{p1}$}{$R_M{p1}$}{$G_M{p1}$}{$B_M{p1}$}
+\par{\textbf{XMM1:}}
+\xmmb{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$A_M{p2}$}{$R_M{p2}$}{$G_M{p2}$}{$B_M{p2}$}{$A_M{p1}$}{$R_M{p1}$}{$G_M{p1}$}{$B_M{p1}$}
+\par{shifteo un byte a la derecha xmm2 y hacemos pmaxub xmm1,xmm2  maximo entre ambos)}
+\par{\textbf{XMM2:}}
+\xmmb{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$A_M{p2}$}{$R_M{p2}$}{$G_M{p2}$}{$B_M{p2}$}{$A_M{p1}$}{$R_M{p1}$}{$G_M{p1}$}{$B_M{p1}$}
+
+\par{\textbf{XMM1:}}
+\xmmb{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$RG_M{p2}$}{$Fruta$}{$Fruta$}{$Fruta$}{$RG_M{p1}$}{$Fruta$}
+\par {notar que varias casillas ahora tienen mas la asignacion de "fruta", y esto no es porque no sepamos que hay dentro de cada una, sino que no es informacion relevante a nuestras operaciones y que sera pisada si es necesario dentro de pronto}
+\par{luego volvemos a shiftear y repetir la operacion pmaxub xmm1,xmm2  y queda: }
+
+\par{\textbf{XMM2:}}
+\xmmb{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$A_M{p2}$}{$R_M{p2}$}{$G_M{p2}$}{$B_M{p2}$}{$A_M{p1}$}{$R_M{p1}$}{$G_M{p1}$}{$B_M{p1}$}
+
+\par{\textbf{XMM1:}}
+\xmmb{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$RGB_{p2}$}{$Fruta$}{$Fruta$}{$Fruta$}{$RGB_M{p1}$}
+\par{por ultimo con la instruccion pshuf, dejamos en xmm1 un registro con los maximos de los maximos representado de esta forma: }
+\par{\textbf{XMM1:}}
+\xmmb{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$Fruta$}{$RGB_{p2}$}{$RGB_{p2}$}{$RGB_{p2}$}{$RGB_{p2}$}{$RGB_M{p1}$}{$RGB_M{p1}$}{$RGB_M{p1}$}{$RGB_M{p1}$}
+
+
+	
+	
+   Y en la segunda parte del codigo lo que queda es que a este registro con la info del maximo de los maximos, lo transformamos en un registro con un 1 en el byte donde va el canal que contiene a este maximo entre los maximos (de cada pixel). Y ceros en el resto. \\ Teniendo esto ya,se puede apreciar en el codigo como nos armamos los alphas personalizados para cada pixel y terminamos multiplicandolos y reescribiendo ambos pixeles. \\
+   Por ultimo avanzamos nuestros currents sobre columans en dos porque es la cantidad de pixeles que procesamos y  volvemos en caso de no haber terminado toda la fila a empezar el ciclo interior.
 	
 	
 \subsection{Experimentación}
-\subsubsection{Idea}	En la experimentacion de este filtro al igual que en el resto vamos a comparar el rendimiento respecto a los ciclos de clock, que tiene la funcion colorizar en C desde -o0 a -o3 contra asm. \\ Sin embargo luego vamos a contrastar la funcion de asm, contra sigo mismo pero primero agragando jumps de forma que no influya el flujo del programa solo para molestar al jump predictor. Luego vamos a correrlo tal cual esta, y de apoco vamos a ir desenrollando el codigo. Como dijimos tiene un ciclo externo y uno interno, por lo que vamos a desenrrollar primero el interno 2 veces, luego 4,16,32 y ver que pasa, y finalmente vamos a saltar a desenrrollarlo completamente, cosa de no dejar casi ninguno controlador de flujo.
+\subsubsection{Idea}	En la experimentacion de este filtro al igual que en el resto vamos a comparar el rendimiento respecto a los ciclos de clock, que tiene la funcion colorizar en C desde -o0 a -o3 contra asm. \\ Luego el segundo experimento va a consistir en probar la influencia del jump predictor en el codigo.\\ Primero agragando jumps de forma que no influya el flujo del programa solo para molestar al jump predictor.  Luego vamos a correrlo tal cual esta, y de apoco vamos a ir desenrollando el codigo. Como dijimos tiene un ciclo externo y uno interno, por lo que vamos a desenrrollar primero el interno 4 veces, despues 32 y ver que pasa.\\
+Y finalmente el ultimo experimento que vamos a hacer es aprovechar el tamño que tiene el codigo y vamos a desenrrollarlo completamente, de manera que generemos un codigo tan grande que al correrlo no entre en la memoria cache para que el PC entonces empiece a generar Miss Hits en el momento de ir leyendo la proxima instruccion y ver que pasa entonces.
 	   
 \subsubsection{Hipótesis}
-	Nuestra hipotesis es que el rendimiento va a ir mejorando a medida que vayamos cambiando los programas respectivamente a como los fui mencionando, osea el mas lento va a ser el codigo de asm, molestando al jmp predictor, y el mas rapido el desenrollando el codigo 32 veces. El ultimo test, por mas que desenrollemos todo el programa creemos justamente que va a ser el mas lento, por el tamaño del codigo, creemos que al hacer un codigo de tamaño mayor al de la cache, en un momento el pc va a estar haciendo muchisimos mas miss en la cache, que los que ahorra sacando los controladores de flujo.
-	
+	Nuestra hipotesis es que el rendimiento va a ir mejorando a medida que vayamos cambiando los programas respectivamente a como los fui mencionando, osea el mas lento va a ser el codigo de asm, molestando al jmp predictor, y el mas rapido el desenrollando el codigo 32 veces. \\
+	Y en el el ultimo test, por mas que desenrollemos todo el programa creemos justamente que va a ser el mas lento, por justamente el tamaño del codigo va a generar una gran cantidad de Miss Hits en lecturas de la siguiente instruccion, y que va a vencer la optimizacion generada por eliminar los controladores de flujo.	
 	
 \subsubsection{Resultados}
 	Graficos lindos de lucia :D
@@ -39,10 +74,8 @@ Luego con estos tres valores calculamos el alpha correspondiente de cada canal p
 	
 	
 \subsubsection{Conclusión}
-Conclusion Todo es una mierda.
-Conclusion posta:
  Primera gran conclusión reveladora, c -o0 demuestra ser mucho mas lento que optimizando, el código mejoro 5 veces su cantidad de ciclos por llamada al compilar con -O3.
-  Luego sin embargo la función hecha en  asm le sigue ganando por bastante a C, en una proporción de 3.5 veces mas rápido en cantidad de ciclos todavía.
-  Ahora encuanto al experimento personalizado, hicimos una comparación con distintos códigos para medir la influencia del jump predictor en la ejecución del código. Primera prueba fue ejecutar el mismo código que teníamos con el agregado de que en el ciclo interior (el que se repite mas veces) metíamos una serie de saltos transparentes con diferentes comparaciones, para tratar de romper con pipeline del procesador. Sin embargo por mas duro que itnentasemos descubrimos que el algoritmo que dirige al jump predictor es bastante mas sofisticado de lo que pensábamos, por lo que no pudimos influenciar en lo mas mínimo la eficiencia del código. 
-   Luego para contrastar el ultimo experimento mencionado, intentamos implementar lo contrario, desenrollar el código de manera que nunca influya un miss hit del jump predictor, en la ejecución del programa, sin embargo ya sacando la conclucion de lo mencionado recién, de que el sistema que lo regula es mas sofisticado del esperado, el desenrollar el código principal 2,4,8 veces, no estuvo mostrando ninguna diferencia con respecto al original. 
-   Por ultimo pasamos a otro experimento con desenrollar, en el cual se pretendia desenrollar completamente el codigo, generando un resultado en caunto a la cantidad de ciclos consumidos por llamada mucho mayor, por el tema de que un codigo tan grande no entraria completametne en la cache porl o que a partir de un punto el PC estaria generando constatnes miss hits en la cache y contrarestrando lo logrado evitar por el jump predictos. Y De hecho este experimento funciono muy bien, lo intentamos con una imagen mayor de lena, de 1024x768 para que el ciclo pueda ser desenrrollado mas cantidad de veces, y asi se ve que el codigo modificado tardo en promedio al rededor de unos 14.000.00 de ciclos mas que el original.
+  Luego sin embargo la función hecha en  asm le sigue ganando por bastante a C, en una proporción de 3.5 veces mas rápido en cantidad de ciclos todavía.\\
+  Ahora encuanto al experimento personalizado, hicimos una comparación con distintos códigos para medir la influencia del jump predictor en la ejecución del código. Primera prueba fue la de intentar molestar al Jump Predictor. Sin embargo por mas duro que itnentasemos, descubrimos que el algoritmo que lo dirige, es bastante mas sofisticado de lo que pensábamos, por lo que no pudimos influenciar en lo mas mínimo la eficiencia del código. \\
+   Luego para contrastar el ultimo experimento mencionado, intentamos implementar lo contrario, desenrollar el código de manera que nunca influya un Miss Jump, en la ejecución del programa, sin embargo ya sacando la conclucion de lo mencionado recién, de que el sistema que lo regula es mas sofisticado del esperado, el desenrollar el código principal 4, y 32 veces, no estuvo mostrando ninguna diferencia con respecto al original. \\ 
+   Por ultimo en el experimento final con desenrollar, en el cual se pretendia desenrollar completamente el codigo. Funciono muy bien, lo intentamos con una imagen mayor de lena, de 1024x768 para que el ciclo pueda ser desenrrollado mas cantidad de veces, y asi se ve que el codigo modificado tardo en promedio al rededor de unos 14.000.00 de ciclos mas que el original. Justamente por lo mencionado en la seccion de hipotesis que la cantidad de Miss Hits generados por el P.C tuvo mucha mayor influencia que el tema de los jumps.
