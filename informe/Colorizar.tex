@@ -57,21 +57,28 @@ Y finalmente el último experimento que vamos a hacer es aprovechar el tamaño q
 	Y en el el último test, por más que desenrollemos todo el programa creemos justamente que va a ser el más lento, porque justamente el tamaño del código va a generar una gran cantidad de Miss Hits en lecturas de la siguiente instrucción, y que va a vencer la optimización generada por eliminar los controladores de flujo.	
 	
 \subsubsection{Resultados}
-	Graficos lindos de lucia :D
-	ciclos promedio colorizar c -o0 100 iteraciones : 101.898.160
-	ciclos promedio colorizar c -o3 100 iteraciones : 21.567.776
-	ciclos promedio colorizar original 1000 iteraciones: 5.980.263
-	ciclos promedio colorizar JodiendoJumps1 1000 iteraciones: 5.977.453
-	ciclos promedio colorizar Unrolling Ocho ciclos 100 iteraciones : 5.873.712
+
+\begin{figure}[h!]
+\centering
+	\includegraphics[width = 15 cm, height = 8 cm]{imagenes/ColorizarASMvsC.png}
+	\caption[center]{Gráfico de barras comparando las implementaciones y diversas optimizaciones.}
+\end{figure}
+
+\medskip
+
+\begin{figure}[h!]
+\centering
+	\includegraphics[width = 16 cm, height = 10 cm]{imagenes/jmpunro.png}
+	\caption[center]{Gráfico de barras comparando la implementación original en ASM y la implementación en ASM con diversas modificaciones.}
+\end{figure}
 	
-	
-	
-	ciclos promedio colorizar Unrolling lena 1024x768
-	 todos los cilcos 100 iteraciones : 35.285.958
-	
-	ciclos promedio colorizar original lena 1024x768 100 iteraciones:	21.050.994
-	
-	
+\medskip
+
+\begin{figure}[h!]
+\centering
+	\includegraphics[width = 8 cm, height = 8 cm]{imagenes/1024.png}
+	\caption[center]{Gráfico de barras comparando la implementación original en ASM y la implementación en ASM con unrolling completo aplicado a una imagen de 1024x768.}
+\end{figure}
 	
 \subsubsection{Conclusión}
  Primera gran conclusión reveladora, c -o0 demuestra ser mucho mas lento que optimizando, el código mejoro 5 veces su cantidad de ciclos por llamada al compilar con -O3.
