@@ -59,8 +59,14 @@ Este filtro consiste en tomar bloques de 2x2 píxeles y asignarles a estos el pr
 \end{algorithmic} 
 \end{algorithm}
 \subsection{Código ASM}
+El codigo en ASM consiste en una conjuncion de cilos, uno exterior para iterar sobre las filas y otro interior para iterar sobre los elemntos de la misma (columnas). Lo que hace este codigo es en cada iteracion, lee de memoria dos veces, empezando en la misma columna pero de dos filas diferentes. De esta forma levanta como una matriz de 8 elementos (4x2). Lo que se puede obtener de esta informacion va a servir para sobre escribir 8 pixeles. \\ El ciclo luego procede en exteneder los signos de cada byte, luego guardar la sumatoria de los elementos {1,2,6,7} (mirandolo como una matriz de 4x2), y la sumatoria de {4,5,8,9} en dos registros aparte, calcular el promedio de esto, osea dividirlos por cuatro. Y luego a esta informacion la volvemos a agrupar juntas en un mismo registro que se veria de esta manera :
+
+\par{\textbf{XMM:}}
+\xmmb{$Pp1_a$}{$Pp1_r$}{$Pp1_g$}{$Pp1_b$}{$Pp1_a$}{$Pp1_r$}{$Pp1_g$}{$Pp1_b$}{$Pp2_a$}{$Pp2_r$}{$Pp2_g$}{$Pp2_b$}{$Pp2_a$}{$Pp2_r$}{$Pp2_e$}{$Pp2_b$}
+\par {Pp1 : promedio pixeles {1,2,6,7}. Pp2 : promedio pixeles {4,5,8,9}}
 	
 	
+.\\ Y finalmente a este registro lo escribimos en la imagen destino, en los lugar de los cual levantamos en la imagen src. \\ Por ultimo movemos los current en columnas 4 pixeles que es la cantidad sobre esa fila q procesamos en cada iteracion. Y si terminamos de procesar la fila, nos movemos dos filas, ya que vamos procesando dos juntas a la vez.
 	
 \subsection{Experimentación}
 \subsubsection{Idea}	
