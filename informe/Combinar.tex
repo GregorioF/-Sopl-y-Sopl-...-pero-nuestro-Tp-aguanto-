@@ -164,6 +164,7 @@ se ejecuta la instrucción \textbf{punpcklbw xmm1, xmm9} que da como resultado
 \begin{figure}[h!]
 \centering
 	\includegraphics[width = 12 cm, height = 8 cm]{imagenes/CombinarASM-Cs.jpeg}
+	\caption[center]{Gráfico de barras comparando las implementaciones y diversas optimizaciones.}
 \end{figure}
 
 \par{Como se puede apreciar, la implementación de ASM es casi 29 veces más rápida que la menos optimizada de C y también supera ampliamente a las optimizadas, siendo más de 10 veces más rápida. Esto confirma nuestras suposiciones de la mejoría resultante del modelo de procesamiento SIMD.}
@@ -175,6 +176,7 @@ se ejecuta la instrucción \textbf{punpcklbw xmm1, xmm9} que da como resultado
 \begin{figure}[h!]
 \centering
 	\includegraphics[width = 12 cm, height = 8 cm]{imagenes/CombinarMemoria.png}
+\caption[center]{En estos gráficos se exponen las diferencias en las implementaciones en cuanto a la proporción de tiempo destinado a accesos a memoria y a procesamiento de la imagen.}
 \end{figure}
 
 \par{A simple vista se observa que la implementación de ASM da como resultado que la mayor parte del tiempo de ejecución esté destinada al procesamiento de la imagen, al contrario de lo que ocurre con la implementación de C que resulta en un mayor consumo de ciclos por parte de los accesos a memoria.

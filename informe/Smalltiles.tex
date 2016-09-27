@@ -54,13 +54,16 @@ Nuestra implementación de ASM consiste en un ciclo que itera sobre las filas, p
 	Efectivamente eso es lo que podemos observar en el siguiente gráfico. La cantidad de ciclos varía más en las imagenes de 200x1600 y 1600x200, donde podemos observar una diferencia de más de 4 millones de ciclos. En cambio en el par de imagenes de 640x500 y 500x640 la diferencia es de tan solo 1 millón y medio (exactamente 155981 ciclos). Estos experimentos se realizaron con la misma imagen rotada y sin rotar, aunque en el caso de este filtro, las cualidades de los píxeles no modifican los resultados.
 
 \begin{figure}[h!]
-\includegraphics[width = 15 cm, height = 10 cm]{imagenes/distintostamanos.png}
-\caption{•}
+\centering
+\includegraphics[width = 15 cm, height = 8 cm]{imagenes/distintostamanos.png}
+\caption[center]{Gráfico de barras que da cuenta de los ciclos que implica cada corrida del filtro para imágenes de distintos tamaños con una determinada cantidad fija de píxeles.}
 \end{figure}
 	
 	A continuación adjuntamos el gráfico que compara la cantidad de ciclos que tarda en ejecutarse el filtro implementado en ASM y el implementado en C.
-	\begin{figure}[h!]
-\includegraphics[width = 15 cm, height = 10 cm]{imagenes/ASMvsC.png}
-\caption{•}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width = 15 cm, height = 8 cm]{imagenes/ASMvsCSmalltiles.png}
+\caption[center]{Comparación de las implementaciones y compilaciones con distintos niveles de optimización en cuanto a la rapidez para el procesamiento de una imagen.}
 \end{figure}
 	

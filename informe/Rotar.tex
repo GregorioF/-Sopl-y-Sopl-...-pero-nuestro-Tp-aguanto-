@@ -54,15 +54,17 @@ La hipotesis que tuvimos sobre la primera idea era que efectivamente ibamos a no
 	A continuación adjuntamos un gráfico en el que se puede apreciar dicha diferencia.
 	
 \begin{figure}[h!]
-	\includegraphics[width = 15 cm, height = 10 cm]{imagenes/SinSIMD.png}
-\caption{•}
+\centering
+	\includegraphics[width = 15 cm, height = 8 cm]{imagenes/SinSIMD.png}
+\caption[center]{Gráfico que compara las velocidad de las ejecuciones de las implementaciones con y sin el uso de instrucciones SSE, y también con optimizaciones de la implementación en C.}
 \end{figure}
 
 	El gráfico se armó en base a un conjunto de corridas de cada implementación del filtro, de donde se tomó la cantidad mínima de ciclos; con esto buscamos reducir la proporción de tiempo que consideramos que nuestro programa no estaba corriendo, si no que el scheduler estaba ejecutando otro programa.
 	
-	A continuación mostramos un gráfico (armado de igual manera que el anterior) donde mostramos lo
-s tiempos de ejecución del filtro implementado en ASM y en C con distintas optimizaciones.
+	A continuación mostramos un gráfico (armado de igual manera que el anterior) donde mostramos los tiempos de ejecución del filtro implementado en ASM y en C con distintas optimizaciones.
 	
 \begin{figure}[h!]
-	\includegraphics[width = 15 cm, height = 10 cm]{imagenes/rotarConC.png}
+\centering
+\includegraphics[width = 15 cm, height = 8 cm]{imagenes/rotarConC.png}
+\caption[center]{Diferencias en cantidad de ciclos para la ejecución del filtro con la implementación en ASM y la de C con sus optimizaciones.}
 \end{figure}
