@@ -146,7 +146,7 @@ combinar_asm:
 					packusdw xmm13, xmm12 ; empaqueto de dw a w, xmm13 == pixel de xmm12, es decir, el pixel 2, seguido del pixel de xmm13, el 3
 					packusdw xmm11, xmm10 ; empaqueto de dw a w, xmm11 == pixel de xmm10, es decir, el pixel 0, seguido del pixel de xmm11, el 1
 					packuswb xmm13, xmm11 ; empaqueto de w a b, xmm13 == pixel 0, pixel 1, pixel 2, pixel 3
-					pshufd xmm11, xmm13, 0x1b		; esto porque tienen q ser al revés la de un lado a la del otro!
+					pshufd xmm11, xmm13, 0x1B		; esto porque tienen q ser al revés la de un lado a la del otro!
 
 ; ============ Pongo en la imagen destino en la mitad izquierda de la imagen =======================
 					movdqu [rsi + 4*r9], xmm11
@@ -192,8 +192,8 @@ combinar_asm:
 
 .QuizasFaltaProcesar:
 					; veo si falta procesar 4 píxeles en el medio o si ya está esta fila
-					cmp rdx, 4 ; el resto de la división por 8 con 4
-					je .faltaProcesar
+					cmp rdx, 0 ; el resto de la división por 8 con 4
+					jne .faltaProcesar
 		 ; ya se procesó todo y terminé la fila
 		jmp .terminoFila
 
@@ -235,8 +235,8 @@ combinar_asm:
 
 		mulps xmm10, xmm0 ; Multiplico por alpha: xmm10 == | alpha *  | ... | ... | alpha *  | (pixel 0 - pixel 3)
 		mulps xmm11, xmm0 ; xmm11 == alpha * ( pixel 1 - pixel 2)
-		mulps xmm11, xmm0 ; xmm11 == alpha * ( pixel 2 - pixel 1)
-		mulps xmm11, xmm0 ; xmm11 == alpha * ( pixel 3 - pixel 0)
+		mulps xmm12, xmm0 ; xmm11 == alpha * ( pixel 2 - pixel 1)
+		mulps xmm13, xmm0 ; xmm11 == alpha * ( pixel 3 - pixel 0)
 
 		divps xmm10, xmm14 ; xmm10 == alpha * ( pixel 0 - pixel 3)  / 255
 		divps xmm11, xmm14 ; xmm11 == alpha * ( pixel 1 - pixel 2)  / 255
@@ -279,3 +279,10 @@ combinar_asm:
 		pop rbx
 		pop rbp
 		ret
+
+
+
+
+
+
+	;	al de la izquierda le resto 2 y al otro le sumo 2
