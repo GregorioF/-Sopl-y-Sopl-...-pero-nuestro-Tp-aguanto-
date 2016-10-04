@@ -169,8 +169,14 @@ colorizar_asm:
 
 			
 			; == recordar que xmm10 tiene 4 floats = 1.
+			pslldq xmm5, 4
+			psrldq xmm5, 4
+			pslldq xmm6, 4
+			psrldq xmm6, 4
+			
 			addps xmm5, xmm10  
 			addps xmm6, xmm10 ; aca me qda po lo que tengo q multiplicar a los pixeles iniciales para el resultado final
+			
 
 
 
