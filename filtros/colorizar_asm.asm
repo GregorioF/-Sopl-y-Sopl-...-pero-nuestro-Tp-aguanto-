@@ -184,8 +184,6 @@ colorizar_asm:
 			
 			pxor xmm0, xmm0
 
-			
-			
 			movups xmm9, xmm7		; xmm9 == p7|p6|p5|p4
 			movups xmm8, xmm7  		; xmm8 == p7|p6|p5|p4
 			
@@ -201,7 +199,7 @@ colorizar_asm:
 			;====================================================
 			
 			cvtdq2ps xmm7, xmm7
-			cvtdq2ps xmm9, xmm9		; PASO AMBOS A FLOAT PARA PODER MULTIPLICAR POR EL VALOR DE CADA ALPHA
+			cvtdq2ps xmm9, xmm9	  ; PASO AMBOS A FLOAT PARA PODER MULTIPLICAR POR EL VALOR DE CADA ALPHA
 
 			mulps xmm9, xmm6
 			mulps xmm7, xmm5
@@ -261,14 +259,15 @@ ret
 ; en xmm0 viene el registro 
 checkearCasoDosMaximos:
 	pmovmskb eax, xmm0
-			
-	cmp ax, 0x0f0f
+	shl rax, 52
+	shr rax, 52
+	cmp rax, 0xf0f
 	je .casoRyB
-	cmp ax, 0xff0
+	cmp rax, 0xff0
 	je .casoRyG
-	cmp ax, 0x0ff
+	cmp rax, 0x0ff
 	je .casoGyB
-	cmp ax, 0xfff
+	cmp rax, 0xfff
 	je .casoRyGyB
 	jmp .fin
 	 
