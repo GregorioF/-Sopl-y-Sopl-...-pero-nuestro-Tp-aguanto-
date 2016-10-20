@@ -48,20 +48,58 @@ Luego con estos tres valores calculamos el alpha correspondiente de cada canal p
    Por último avanzamos nuestros currents sobre columnas en dos porque es la cantidad de píxeles que procesamos y  volvemos en caso de no haber terminado toda la fila a empezar el ciclo interior.
 	
 	
-\subsection{Experimentación}
-\subsubsection{Idea}	En la experimentación de este filtro al igual que en el resto vamos a comparar el rendimiento respecto a los ciclos de clock, que tiene la funcion colorizar en C desde -o0 a -o3 contra asm. \\ Luego el segundo experimento va a consistir en probar la influencia del jump predictor en el código.\\ Primero agragando jumps de forma que no influya el flujo del programa solo para molestar al jump predictor.  Luego vamos a correrlo tal cual está, y de a poco vamos a ir desenrollando el código. Como dijimos tiene un ciclo externo y uno interno, por lo que vamos a desenrrollar primero el interno 4 veces, despues 32 y ver que pasa.\\
-Y finalmente el último experimento que vamos a hacer es aprovechar el tamaño que tiene el código y vamos a desenrrollarlo completamente, de manera que generemos un código tan grande que al correrlo no entre en la memoria cache para que el PC entonces empiece a generar Miss Hits en el momento de ir leyendo la próxima instrucción y ver qué pasa entonces.
-	   
-\subsubsection{Hipótesis}
-	Nuestra hipotesis es que el rendimiento va a ir mejorando a medida que vayamos cambiando los programas respectivamente a como los fuimos mencionando, es decir, el más lento va a ser el código de asm molestando al jmp predictor, y el mas rápido desenrollando el codigo 32 veces. \\
-	Y en el el último test, por más que desenrollemos todo el programa creemos justamente que va a ser el más lento, porque justamente el tamaño del código va a generar una gran cantidad de Miss Hits en lecturas de la siguiente instrucción, y que va a vencer la optimización generada por eliminar los controladores de flujo.	
+\subsection{Experimentación 1}
+
+\subsubsection{Idea}
+	El primer experimento al igua que en el resto de los filtros, vamos a realizar la comparaciones 
+	de cantidad de ciclos, por pixel procesado,  entre los Codigos de C sin optimizar, C optimizado nivel 3, y Asm. En esto vamos a realizar tres comparaciones. La primera trata de comparar entre imagenes cuadradas, como evoluciona el rendimiento con el tamaño de imagen que le pasemos, y Como se ven con respecto a los otros codigos. La segunda comparacion trata de comparar imagenes con la misma cantidad d pixeles, pero con diferentes dimensiones. Y por ultimo comapramos rendimientos al tratar de imagenes con el mismo color en cada pixel.
+	
+	
+\subsubsection{Hipotesis}
+	En la primer comparacion esperamos como siempre que el codigo de asm sea el mas optimo, luego le siga el codigo en C optimizado, y por ultimo el codigo de C sin optimizar. \\ 
+	En la segunda comparacion, se espera que sea similarla cantidad de ciclos por pixel que se obtiene porq el ciclo no busca ninguna optimizacion respecto al ancho o alto d la imagen, sino que procesa por igual a todos los pixeles.
+	Y por ultimo en el tercer experimento suponemos lo mismo, no buscamos ninguna optimizacion con respecto a los valores d lox pixeles adyacentes, sino q procesamos por igual a cada pixel indistintamente d su contexto, por lo que esperamos que los valores sean constantes.
 	
 \subsubsection{Resultados}
 
 \begin{figure}[h!]
 \centering
 \captionsetup{justification=centering}
-	\includegraphics[width = 15 cm, height = 8 cm]{imagenes/ColorizarASMvsC.png}
+	\includegraphics[width = 15 cm, height = 8 cm]{imagenes/ImgCuadradas.jpg}
+	\caption[center]{Gráfico de barras comparando las implementaciones y diversas optimizaciones.}
+\end{figure}
+
+\medskip\begin{figure}[h!]
+\centering
+\captionsetup{justification=centering}
+	\includegraphics[width = 15 cm, height = 8 cm]{imagenes/DifDimensiones.jpg}
+	\caption[center]{Gráfico de barras comparando las implementaciones y diversas optimizaciones.}
+\end{figure}
+
+\medskip\begin{figure}[h!]
+\centering
+\captionsetup{justification=centering}
+	\includegraphics[width = 15 cm, height = 8 cm]{imagenes/mismoColor.jpg}
+	\caption[center]{Gráfico de barras comparando las implementaciones y diversas optimizaciones.}
+\end{figure}
+
+\medskip
+
+	
+
+\subsubsection{Ideasda}	En la experimentación de este filtro al igual que en el resto vamos a comparar el rendimiento respecto a los ciclos de clock, que tiene la funcion colorizar en C desde -o0 a -o3 contra asm. \\ Luego el segundo experimento va a consistir en probar la influencia del jump predictor en el código.\\ Primero agragando jumps de forma que no influya el flujo del programa solo para molestar al jump predictor.  Luego vamos a correrlo tal cual está, y de a poco vamos a ir desenrollando el código. Como dijimos tiene un ciclo externo y uno interno, por lo que vamos a desenrrollar primero el interno 4 veces, despues 32 y ver que pasa.\\
+Y finalmente el último experimento que vamos a hacer es aprovechar el tamaño que tiene el código y vamos a desenrrollarlo completamente, de manera que generemos un código tan grande que al correrlo no entre en la memoria cache para que el PC entonces empiece a generar Miss Hits en el momento de ir leyendo la próxima instrucción y ver qué pasa entonces.
+	   
+\subsubsection{Hipótesisasd}
+	Nuestra hipotesis es que el rendimiento va a ir mejorando a medida que vayamos cambiando los programas respectivamente a como los fuimos mencionando, es decir, el más lento va a ser el código de asm molestando al jmp predictor, y el mas rápido desenrollando el codigo 32 veces. \\
+	Y en el el último test, por más que desenrollemos todo el programa creemos justamente que va a ser el más lento, porque justamente el tamaño del código va a generar una gran cantidad de Miss Hits en lecturas de la siguiente instrucción, y que va a vencer la optimización generada por eliminar los controladores de flujo.	
+	
+\subsubsection{Resultadosasdas}
+
+\begin{figure}[h!]
+\centering
+\captionsetup{justification=centering}
+	\includegraphics[width = 15 cm, height = 8 cm]{imagenes/ImgCuadradas.jpg}
 	\caption[center]{Gráfico de barras comparando las implementaciones y diversas optimizaciones.}
 \end{figure}
 
@@ -83,7 +121,7 @@ Y finalmente el último experimento que vamos a hacer es aprovechar el tamaño q
 	\caption[center]{Gráfico de barras comparando la implementación original en ASM y la implementación en ASM con unrolling completo aplicado a una imagen de 1024x768.}
 \end{figure}
 	
-\subsubsection{Conclusión}
+\subsubsection{Conclusiónasdasd}
  Primera gran conclusión reveladora, c -o0 demuestra ser mucho mas lento que optimizando, el código mejoro 5 veces su cantidad de ciclos por llamada al compilar con -O3.
   Luego sin embargo la función hecha en asm le sigue ganando por bastante a C, en una proporción de 3.5 veces más rápido en cantidad de ciclos todavía.\\
   Ahora en cuanto al experimento personalizado, hicimos una comparación con distintos códigos para medir la influencia del jump predictor en la ejecución del código. Primera prueba fue la de intentar molestar al Jump Predictor. Sin embargo, por más que intentamos, descubrimos que el algoritmo que lo dirige es mucho más sofisticado de lo que pensábamos, por lo que no pudimos modificar en lo mas mínimo la eficiencia del código. \\
