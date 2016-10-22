@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-char* name = "tiemposLeer.csv";
+char* nam = "tiemposLeer.csv";
 
 float clamp(float pixel)
 {
@@ -51,7 +51,7 @@ void combinar_c (unsigned char *src, unsigned char *dst, int cols, int filas, in
 			p_d->a = n4;
 
 			volatile unsigned long long int cant_ciclos = end-start;
-			FILE *pFile = fopen( name, "a" );
+			FILE *pFile = fopen( nam, "a" );
 			fprintf(pFile,"%.3f\n", (float)cant_ciclos);
 			fclose( pFile );
 
