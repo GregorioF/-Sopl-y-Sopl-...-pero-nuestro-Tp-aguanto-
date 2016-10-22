@@ -52,7 +52,7 @@ void combinar_c (unsigned char *src, unsigned char *dst, int cols, int filas, in
 
 			volatile unsigned long long int cant_ciclos = end-start;
 			FILE *pFile = fopen( name, "a" );
-			fprintf(pFile,"%.3f\n", (float)cant_ciclos/(float)cant_iteraciones);
+			fprintf(pFile,"%.3f\n", (float)cant_ciclos;
 			fclose( pFile );
 
 
