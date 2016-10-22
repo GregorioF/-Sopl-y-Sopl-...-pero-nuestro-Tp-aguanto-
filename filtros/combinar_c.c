@@ -26,6 +26,8 @@ void combinar_c (unsigned char *src, unsigned char *dst, int cols, int filas, in
 	unsigned char (*src_matrix)[src_row_size] = (unsigned char (*)[src_row_size]) src;
 	unsigned char (*dst_matrix)[dst_row_size] = (unsigned char (*)[dst_row_size]) dst;
 
+	volatile unsigned long long int cant_ciclos = 0;
+
 	for(int f = 0; f<filas; f++){
 		for(int c = 0; c<cols; c++){
 
@@ -50,12 +52,12 @@ void combinar_c (unsigned char *src, unsigned char *dst, int cols, int filas, in
 			p_d->r = n3;
 			p_d->a = n4;
 
-			volatile unsigned long long int cant_ciclos = end-start;
-			FILE *pFile = fopen( nam, "a" );
-			fprintf(pFile,"%.3f\n", (float)cant_ciclos);
-			fclose( pFile );
-
-
+			cant_ciclos += end-start;
 		}
 	}
+
+	FILE *pFile = fopen( nam, "a" );
+	fprintf(pFile,"%.3f\n", (float)cant_ciclos);
+	fclose( pFile );
+
 }
