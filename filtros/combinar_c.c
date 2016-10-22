@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-char* nam = "tiemposProcesar.csv";
+char* nam = "tiemposProcesarPorIteracion.csv";
 
 float clamp(float pixel)
 {
@@ -27,11 +27,11 @@ void combinar_c (unsigned char *src, unsigned char *dst, int cols, int filas, in
 	unsigned char (*dst_matrix)[dst_row_size] = (unsigned char (*)[dst_row_size]) dst;
 
 	volatile unsigned long long int cant_ciclos = 0;
-	//volatile unsigned long long int cant_iteraciones = 0;
+	volatile unsigned long long int cant_iteraciones = 0;
 
 	for(int f = 0; f<filas; f++){
 		for(int c = 0; c<cols; c++){
-			//cant_iteraciones += 1;
+			cant_iteraciones += 1;
 			
 			//lectura:
 			bgra_t *p_sa = (bgra_t*) &src_matrix[f][c * 4];
@@ -58,7 +58,7 @@ void combinar_c (unsigned char *src, unsigned char *dst, int cols, int filas, in
 		}
 	}
 
-	cant_ciclos = cant_ciclos;
+	cant_ciclos = cant_ciclos/cant_iteraciones;
 	FILE *pFile = fopen( nam, "a" );
 	fprintf(pFile,"%.3f\n", (float)cant_ciclos);
 	fclose( pFile );
