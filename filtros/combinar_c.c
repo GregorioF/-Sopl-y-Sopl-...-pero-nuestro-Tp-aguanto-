@@ -27,7 +27,7 @@ void combinar_c (unsigned char *src, unsigned char *dst, int cols, int filas, in
 	unsigned char (*dst_matrix)[dst_row_size] = (unsigned char (*)[dst_row_size]) dst;
 
 	volatile unsigned long long int cant_ciclos = 0;
-	//volatile unsigned long long int cant_iteraciones = 0;
+	volatile unsigned long long int cant_iteraciones = 0;
 
 	for(int f = 0; f<filas; f++){
 		for(int c = 0; c<cols; c++){
