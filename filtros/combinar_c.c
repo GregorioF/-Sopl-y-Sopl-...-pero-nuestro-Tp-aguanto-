@@ -29,12 +29,14 @@ void combinar_c (unsigned char *src, unsigned char *dst, int cols, int filas, in
 	volatile unsigned long long int cant_ciclos = 0;
 	//volatile unsigned long long int cant_iteraciones = 0;
 
-	volatile unsigned long long start, end;
-	MEDIR_TIEMPO_START(start);
-
 	for(int f = 0; f<filas; f++){
 		for(int c = 0; c<cols; c++){
-		//	cant_iteraciones += 1;
+
+			cant_iteraciones += 1;
+			
+			volatile unsigned long long start, end;
+			MEDIR_TIEMPO_START(start);
+			
 			//lectura:
 			bgra_t *p_sa = (bgra_t*) &src_matrix[f][c * 4];
 			bgra_t *p_sb = (bgra_t*) &src_matrix[f][(cols - c -1) * 4];
@@ -54,14 +56,13 @@ void combinar_c (unsigned char *src, unsigned char *dst, int cols, int filas, in
 			p_d->r = n3;
 			p_d->a = n4;
 
+			MEDIR_TIEMPO_STOP(end);
+			cant_ciclos += end-start;
+
 		}
 	}
 
-	MEDIR_TIEMPO_STOP(end);
-	cant_ciclos += end-start;
-
-
-	//cant_ciclos = cant_ciclos;
+	cant_ciclos = cant_ciclos/cant_iteraciones;
 	FILE *pFile = fopen( nam, "a" );
 	fprintf(pFile,"%.3f\n", (float)cant_ciclos);
 	fclose( pFile );
