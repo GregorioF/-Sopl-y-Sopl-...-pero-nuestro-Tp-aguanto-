@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-char* nam = "tiemposEscribirPorIteracion.csv";
+char* nam = "tiemposTotal.csv";
 
 float clamp(float pixel)
 {
@@ -29,10 +29,12 @@ void combinar_c (unsigned char *src, unsigned char *dst, int cols, int filas, in
 	volatile unsigned long long int cant_ciclos = 0;
 	//volatile unsigned long long int cant_iteraciones = 0;
 
+	volatile unsigned long long start, end;
+	MEDIR_TIEMPO_START(start);
+
 	for(int f = 0; f<filas; f++){
 		for(int c = 0; c<cols; c++){
 		//	cant_iteraciones += 1;
-			
 			//lectura:
 			bgra_t *p_sa = (bgra_t*) &src_matrix[f][c * 4];
 			bgra_t *p_sb = (bgra_t*) &src_matrix[f][(cols - c -1) * 4];
@@ -46,21 +48,20 @@ void combinar_c (unsigned char *src, unsigned char *dst, int cols, int filas, in
 			float n4 = clamp(combine(p_sa->a, p_sb->a, alpha));
 			
 			//escritura:
-			volatile unsigned long long start, end;
-			MEDIR_TIEMPO_START(start);
-
+			
 			p_d->b = n;
 			p_d->g = n2;
 			p_d->r = n3;
 			p_d->a = n4;
 
-			MEDIR_TIEMPO_STOP(end);
-
-			cant_ciclos += end-start;
 		}
 	}
 
-	cant_ciclos = cant_ciclos;
+	MEDIR_TIEMPO_STOP(end);
+	cant_ciclos += end-start;
+
+
+	//cant_ciclos = cant_ciclos;
 	FILE *pFile = fopen( nam, "a" );
 	fprintf(pFile,"%.3f\n", (float)cant_ciclos);
 	fclose( pFile );
