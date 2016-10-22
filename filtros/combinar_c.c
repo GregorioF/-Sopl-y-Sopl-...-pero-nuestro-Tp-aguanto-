@@ -2,6 +2,10 @@
 #include "../tp2.h"
 #include "../helper/tiempo.h"
 
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 char* name = "tiemposLeer.csv";
 
 float clamp(float pixel)
