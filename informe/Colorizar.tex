@@ -57,8 +57,8 @@ Luego con estos tres valores calculamos el alpha correspondiente de cada canal p
 	
 \subsubsection{Hipotesis}
 	En la primer comparacion esperamos como siempre que el codigo de asm sea el mas optimo, luego le siga el codigo en C optimizado, y por ultimo el codigo de C sin optimizar. \\ 
-	En la segunda comparacion, se espera que sea similarla cantidad de ciclos por pixel que se obtiene porq el ciclo no busca ninguna optimizacion respecto al ancho o alto d la imagen, sino que procesa por igual a todos los pixeles.
-	Y por ultimo en el tercer experimento suponemos lo mismo, no buscamos ninguna optimizacion con respecto a los valores d lox pixeles adyacentes, sino q procesamos por igual a cada pixel indistintamente d su contexto, por lo que esperamos que los valores sean constantes.
+	En la segunda comparacion, se espera que sea similarla cantidad de ciclos por pixel que se obtiene porque el ciclo no busca ninguna optimizacion respecto al ancho o alto de la imagen, sino que procesa por igual a todos los pixeles.
+	Y por ultimo en el tercer experimento suponemos lo mismo, no buscamos ninguna optimizacion con respecto a los valores de los pixeles adyacentes, sino que procesamos por igual a cada pixel indistintamente de su contexto, por lo que esperamos que los valores sean constantes.
 	
 \subsubsection{Resultados}
 
@@ -85,45 +85,55 @@ Luego con estos tres valores calculamos el alpha correspondiente de cada canal p
 
 \medskip
 
+\subsubsection{Conclucion}
+La conclucion que podemos sacar de estas imagenes, es que, en primer lugar, como dijimos en la hipotesis, que se termino corroborando, el codigo en C sin optimizar fue por lejos mas lento que los otros dos. Y el codigo en C optimizado por mas que mejoro muchisimo con respecto al anterior, siguio siendo mas lento que el codigo en asm. \\ Luego podemos ver que no nos confundimos tampoco en el momento de cambiar los tamaño de las imagenes pues los valores se mantuvieron bastantes constantes, y esto porque justamente no se cambia la cantidad de operaciones que se hace respecto a las dimensiones de las imagenes, siempre se mantiene segun la cantidad de pixeles. \\ Por ultimo sin embargo no llamo la atencion el experimento de correr los codigos con imagenes de un solo color. Lo que paso aca de extraño se que bueno los codigos en asm y en C -O3 se mantuvieron cosntantes a los desarrollados con imagenes comunes, sin embargo el codigo en C -O0 demostros una gran mejora respecto a su performance, la cual no podemos explicar bien el porque de ella, y de hecho esto tambien se ve en la primer imagen, donde el las imagenes de 4096x4096 el codigo en C -O0 mostro que mejoraba su rendimiento. Y la explicacion que le asignamos a eso es que justamente porque las imagenes que le pasamos tienen grandes secciones con pixeles del mismo color, porque son eexpanciones de una imagen de 512x512. Y se genera en estos fragmentos esta optimizacion que no podemos explicar sobre C -O0 en imagenes donde el color no cambia.
+
 	
 
-\subsubsection{Ideasda}	En la experimentación de este filtro al igual que en el resto vamos a comparar el rendimiento respecto a los ciclos de clock, que tiene la funcion colorizar en C desde -o0 a -o3 contra asm. \\ Luego el segundo experimento va a consistir en probar la influencia del jump predictor en el código.\\ Primero agragando jumps de forma que no influya el flujo del programa solo para molestar al jump predictor.  Luego vamos a correrlo tal cual está, y de a poco vamos a ir desenrollando el código. Como dijimos tiene un ciclo externo y uno interno, por lo que vamos a desenrrollar primero el interno 4 veces, despues 32 y ver que pasa.\\
-Y finalmente el último experimento que vamos a hacer es aprovechar el tamaño que tiene el código y vamos a desenrrollarlo completamente, de manera que generemos un código tan grande que al correrlo no entre en la memoria cache para que el PC entonces empiece a generar Miss Hits en el momento de ir leyendo la próxima instrucción y ver qué pasa entonces.
-	   
-\subsubsection{Hipótesisasd}
-	Nuestra hipotesis es que el rendimiento va a ir mejorando a medida que vayamos cambiando los programas respectivamente a como los fuimos mencionando, es decir, el más lento va a ser el código de asm molestando al jmp predictor, y el mas rápido desenrollando el codigo 32 veces. \\
-	Y en el el último test, por más que desenrollemos todo el programa creemos justamente que va a ser el más lento, porque justamente el tamaño del código va a generar una gran cantidad de Miss Hits en lecturas de la siguiente instrucción, y que va a vencer la optimización generada por eliminar los controladores de flujo.	
-	
-\subsubsection{Resultadosasdas}
+\subsection{Experimentacion 2}	
 
-\begin{figure}[h!]
+\subsubsection{Idea}
+	El segundo experimento, es un experimento mas destructivo. Vamos a intentar molestar al jump predictor y ver como influye eso en la  performance del programa. 
+	El experimento en si trata de agarrar un numero arbitrario desde los datos de entrada y en diferentes puntos de parada, ejecutar un control de flujo if then else, tal que dependiendo de ciertas condiciones random de este numero arbitrario, salte  a diferentes secciones del codigo. TOdo esto dispuesto de tal manera que sea transparente a la ejecucion final del programa, osea si el codigo sigue el camino del if no cambia a si siquue el camino del else.
+
+\subsubsection{Hipotesis}
+	Nuestra hipotesis es que justamente el codigo no modificado va a ser bastante mas optimo al codigo desarrollado con molestias para el jump predictor, porque en caso de funcionar estas, en cada ciclo estariamos haciendo que flushee el pipeline, y que pierda muchos ciclos de clock extra.
+	
+\subsubsection{Resutltados}
+
+\medskip\begin{figure}[h!]
 \centering
 \captionsetup{justification=centering}
-	\includegraphics[width = 15 cm, height = 8 cm]{imagenes/ImgCuadradas.jpg}
+	\includegraphics[width = 15 cm, height = 8 cm]{imagenes/JumpPredictor.jpg}
 	\caption[center]{Gráfico de barras comparando las implementaciones y diversas optimizaciones.}
 \end{figure}
 
 \medskip
 
-\begin{figure}[h!]
-\centering
-\captionsetup{justification=centering}
-	\includegraphics[width = 16 cm, height = 10 cm]{imagenes/jmpunro.png}
-	\caption[center]{Gráfico de barras comparando la implementación original en ASM y la implementación en ASM con diversas modificaciones.}
-\end{figure}
+\subsubsection{Conclucion}
+Efectivamente los resultados fueron los esperados, por lo que nos llevamos como conclucion del experimento que influye mucho la arbitrareidad del flujo del programa que armes, si uno lo hace muy random como en este caso, por mas que no afecte a la complegidad total el programa tarda significativamente mas.
+
+\subsection{Experimento 3}
+
+\subsubsection{Idea}
+En el tercer experimento vamos a ver hasta que punto es optimo aplicar la tecnica de unrolling sobre un codigo. Osea lo que planeamos hacer es correr el codigo de colorizar, sobre una imagen de 1024x1024, desenrrollando el ciclo interior, distinta cantidad de veces, vamos a empezar desenrrollando 16, luego 32, y luego completamente.
+
+	   
+\subsubsection{Hipotesis}
+Lo que esperamos de este experimento es que el codigo desenrrollado 16 y 32 veces, mantenga el nivel de performance con el que demuestra normalmente, o un poco mas optimo, y esto porque en s\'i el codigo de colorizar lleva muchas instrucciones, por lo que los pasos que nos ahorramos al desenrrollar el codigo no es significativo en el total del programa. Sin embargo en el caso de desenrrollar todo el codigo, esperamos una mucha peor performance por parte del codigo y esto debido a que el tamaño del codigo aumentaria enrmomente su tamaño de modo que no entre en la memoria cache el mismo, y deba empezar a hacer lecturas de memoria para leer las instrucciones.
 	
-\medskip
+\subsubsection{Resultados}
 
 \begin{figure}[h!]
 \centering
-	\captionsetup{justification=centering}
-	\includegraphics[width = 12 cm, height = 8 cm]{imagenes/1024.png}
-	\caption[center]{Gráfico de barras comparando la implementación original en ASM y la implementación en ASM con unrolling completo aplicado a una imagen de 1024x768.}
+\captionsetup{justification=centering}
+	\includegraphics[width = 15 cm, height = 8 cm]{imagenes/unroll.jpg}
+	\caption[center]{Gráfico de barras comparando las implementaciones y diversas optimizaciones.}
 \end{figure}
+
+\medskip
+
 	
-\subsubsection{Conclusiónasdasd}
- Primera gran conclusión reveladora, c -o0 demuestra ser mucho mas lento que optimizando, el código mejoro 5 veces su cantidad de ciclos por llamada al compilar con -O3.
-  Luego sin embargo la función hecha en asm le sigue ganando por bastante a C, en una proporción de 3.5 veces más rápido en cantidad de ciclos todavía.\\
-  Ahora en cuanto al experimento personalizado, hicimos una comparación con distintos códigos para medir la influencia del jump predictor en la ejecución del código. Primera prueba fue la de intentar molestar al Jump Predictor. Sin embargo, por más que intentamos, descubrimos que el algoritmo que lo dirige es mucho más sofisticado de lo que pensábamos, por lo que no pudimos modificar en lo mas mínimo la eficiencia del código. \\
-   Luego para contrastar el último experimento mencionado, intentamos implementar lo contrario, desenrollar el código de manera que nunca influya un Miss Jump en la ejecución del programa, sin embargo, ya con la conclusión del experimento anterior, logramos ver que desenrollar el código principal 4 y 32 veces no mostró ninguna diferencia con respecto al original. \\ 
-   Por último en el experimento final con desenrollar, en el cual se pretendia desenrollar completamente el código, tuvimos mejores resultados. Funciono muy bien, lo intentamos con una imagen de 1024x768 para que el ciclo pueda ser desenrrollado más cantidad de veces, y asi se ve que el código modificado tardó en promedio al rededor de unos 14.000.00 de ciclos más que el original. Justamente por lo mencionado en la sección de hipotesis que la cantidad de Miss Hits generados por el P.C tuvo mucha mayor influencia que el tema de los jumps.
+\subsubsection{Conclusión}
+La conclucion que sacamos de este esxprimento es que la tecnica de desenrrollar codigo es efectiva para pequeños whiles, porq eliminas algunas instrucciones inecesarias, sin embargo ya para un while de un tamaño mayor a lo usual, la optimizacion generada por esto se diluye hasta el punto d  no notarse. Ademas de que efectivamente elementos como la memoria cache son limitantes aca, donde pasa que los problemas de lectura a memoria dejan de ser parte de como esta hecho el algoritmo y pasa a ser a simplemente poder leerlo. 
+ 
