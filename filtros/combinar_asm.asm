@@ -51,6 +51,12 @@ combinar_asm:
 	mov rbx, 8
 	div rbx ; divido por 8. Queda en rax el cociente de la división y en rdx el resto.
 
+	push rbp ;; AGREGOOOO!
+	mov rbp, rsp
+	push r10 ; porque r10 vale 0
+	;;AGREGOOO!
+
+
 .cicloExterno:
 		cmp r10, rcx ; comparo r10 con la cantidad de filas
 		je .fin ; si es igual ya terminó de recorrer la matriz y salto al final
@@ -65,13 +71,28 @@ combinar_asm:
 		sub r12, 16 ; r12 == rsi + tamaño de la fila - 16
 
 			.cicloInterno:
+
+					add [rbp], 1
+
 					cmp rbx, rax ; comparo rbx con la cantidad de veces que entran 8 píxeles, con el cociente de la división.
 					je .QuizasFaltaProcesar ; si no es igual falta procesar píxeles en esa fila
+					
+					mov [rsp - 16], rax  ;; AGREGOOOO!
+					rdtscp  ;; AGREGOOOO!
+					push rax  ;; AGREGOOOO!
+					
+
 					movdqu xmm1, [rdi + 4*r9] ; agarro 4 píxeles de la mitad izquierda de la foto		; xmm1 = p3|p2|p1|p0
 					movdqu xmm2, xmm1
 
 					movdqu xmm3, [r11 + 4*r14] ; agarro 4 píxeles de la mitad derecha de la foto		; xmm3 = p7|p6|p5|p4
 					movdqu xmm4, xmm3
+					
+
+					rdtscp
+					push rax
+					pop rax
+
 					punpcklbw xmm1, xmm9 ; | 0 | píxel 1 a | 0 | píxel 1 r | 0 | píxel 1 g | 0 | píxel 1 b | 0 | píxel 0 a | 0 | píxel 0 r | 0 | píxel 0 g | 0 | píxel 0 b |
 					punpckhbw xmm2, xmm9 ; | 0 | píxel 3 a | 0 | píxel 3 r | 0 | píxel 3 g | 0 | píxel 3 b | 0 | píxel 2 a | 0 | píxel 2 r | 0 | píxel 2 g | 0 | píxel 2 b |
 					punpcklbw xmm3, xmm9 ; | 0 | píxel 5 a | 0 | píxel 5 r | 0 | píxel 5 g | 0 | píxel 5 b | 0 | píxel 4 a | 0 | píxel 4 r | 0 | píxel 4 g | 0 | píxel 4 b |
@@ -271,6 +292,26 @@ combinar_asm:
 		jmp .cicloExterno
 
 .fin:
+
+		mov rcx, [rbp]
+		xor r10, r10
+
+		.cicle:
+
+			pop r8
+			pop r9
+			sub r8, r9
+			add rax, r8
+			dec rcx
+			cmp rcx, 0
+			jne .cicle 
+
+		;;EN RAX TENGO EL TOTAL DE TIEMPO INSUMIDO PARA ESCRIBIR!
+
+		add rsp, 8
+		pop rbp
+
+
 		add rsp, 8
 		pop r15
 		pop r14
