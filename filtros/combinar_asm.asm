@@ -25,6 +25,7 @@ extern fprintf
 
 section .data
 	form: db "%d", 10
+	texto: db "tiemposCombinar.txt", 0
 
 section .rodata
 		mascara255: dd 255.0, 255.0, 255.0, 255.0
@@ -315,7 +316,7 @@ combinar_asm:
 
 		push rax
 		mov rax, 5 ; abro el archivo
-		mov rbx, "tiemposCombinar.txt", 0
+		mov rbx, texto
 		mov rcx, 2 ; lectura/escritura
 		mov rdx, 0
 		int 80
