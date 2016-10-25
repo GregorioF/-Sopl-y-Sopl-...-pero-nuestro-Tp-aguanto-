@@ -21,6 +21,10 @@ global combinar_asm
 
 extern combinar_c
 
+
+section .data
+	form: db "%d", 10
+
 section .rodata
 		mascara255: dd 255.0, 255.0, 255.0, 255.0
 		menos1: dd -1.0, -1.0, -1.0, -1.0
@@ -307,6 +311,24 @@ combinar_asm:
 			jne .cicle 
 
 		;;EN RAX TENGO EL TOTAL DE TIEMPO INSUMIDO PARA ESCRIBIR!
+
+		push rax
+		mov rax, 5 ; abro el archivo
+		mov rbx, "tiemposCombinar.txt", 0
+		mov rcx, 2 ; lectura/escritura
+		mov rdx, 0
+		int 80
+
+		mov rdi, rax ; en rax me devuelven el puntero al file q abri
+		pop rax
+		mov rdx, rax ; en rdx lo q quiero imprimir
+		mov rsi, form ; formato
+		
+		call fprintf
+
+		mov rax, 6
+		mov rbx, rdi
+		int 80
 
 		add rsp, 8
 		pop rbp
