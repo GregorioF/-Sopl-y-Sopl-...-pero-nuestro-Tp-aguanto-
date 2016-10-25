@@ -20,6 +20,7 @@
 global combinar_asm
 
 extern combinar_c
+extern fprintf
 
 
 section .data
