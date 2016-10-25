@@ -72,7 +72,7 @@ combinar_asm:
 
 			.cicloInterno:
 
-					add [rbp], 1
+					add qword [rbp], 1
 
 					cmp rbx, rax ; comparo rbx con la cantidad de veces que entran 8 píxeles, con el cociente de la división.
 					je .QuizasFaltaProcesar ; si no es igual falta procesar píxeles en esa fila
