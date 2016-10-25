@@ -57,9 +57,9 @@ combinar_asm:
 	mov rbx, 8
 	div rbx ; divido por 8. Queda en rax el cociente de la división y en rdx el resto.
 
-	push rbp ;; AGREGOOOO!
-	mov rbp, rsp
-	push r10 ; porque r10 vale 0
+	;push rbp ;; AGREGOOOO!
+	;mov rbp, rsp
+	;push r10 ; porque r10 vale 0
 	;;AGREGOOO!
 
 
@@ -83,9 +83,9 @@ combinar_asm:
 					cmp rbx, rax ; comparo rbx con la cantidad de veces que entran 8 píxeles, con el cociente de la división.
 					je .QuizasFaltaProcesar ; si no es igual falta procesar píxeles en esa fila
 					
-					mov [rsp - 16], rax  ;; AGREGOOOO!
-					rdtscp  ;; AGREGOOOO!
-					push rax  ;; AGREGOOOO!
+					;mov [rsp - 16], rax  ;; AGREGOOOO!
+					;rdtscp  ;; AGREGOOOO!
+					;push rax  ;; AGREGOOOO!
 					
 
 					movdqu xmm1, [rdi + 4*r9] ; agarro 4 píxeles de la mitad izquierda de la foto		; xmm1 = p3|p2|p1|p0
@@ -314,26 +314,26 @@ combinar_asm:
 
 		;;EN RAX TENGO EL TOTAL DE TIEMPO INSUMIDO PARA ESCRIBIR!
 
-		push rax
-		mov rax, 5 ; abro el archivo
-		mov rbx, texto
-		mov rcx, 2 ; lectura/escritura
-		mov rdx, 0
-		int 80
+	;	push rax
+	;	mov rax, 5 ; abro el archivo
+	;	mov rbx, texto
+	;	mov rcx, 2 ; lectura/escritura
+	;	mov rdx, 0
+	;	int 80
 
-		mov rdi, rax ; en rax me devuelven el puntero al file q abri
-		pop rax
-		mov rdx, rax ; en rdx lo q quiero imprimir
-		mov rsi, form ; formato
+	;	mov rdi, rax ; en rax me devuelven el puntero al file q abri
+	;	pop rax
+	;	mov rdx, rax ; en rdx lo q quiero imprimir
+	;	mov rsi, form ; formato
 		
-		call fprintf
+	;	call fprintf
 
-		mov rax, 6
-		mov rbx, rdi
-		int 80
+	;	mov rax, 6
+	;	mov rbx, rdi
+	;	int 80
 
-		add rsp, 8
-		pop rbp
+	;	add rsp, 8
+	;	pop rbp
 
 
 		add rsp, 8
