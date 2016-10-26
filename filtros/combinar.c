@@ -5,7 +5,7 @@
 
 #include "../tp2.h"
 
-char* nombre = "tiemposCombinar.csv"
+char* nombre = "tiemposCombinar.csv";
 
 void imprimirArchivo(int n){
 	FILE* pFile = fopen(nombre, "a");
