@@ -100,11 +100,11 @@ combinar_asm:
 					
 					push rax
 					push rdx
-					push rdi
-					mov rdi, [current]
+					push rsi
+					mov rsi, [current]
 					rdtscp  ;; AGREGOOOO!
 
-					mov [puntero + rdi*8], rax
+					mov [puntero + rsi*8], rax
 
 					movdqu xmm1, [rdi + 4*r9] ; agarro 4 píxeles de la mitad izquierda de la foto		; xmm1 = p3|p2|p1|p0
 					movdqu xmm2, xmm1
@@ -115,10 +115,10 @@ combinar_asm:
 
 					rdtscp
 					inc byte [current]
-					mov rdi, [current]
-					mov [puntero + rdi*8], rax
+					mov rsi, [current]
+					mov [puntero + rsi*8], rax
 					inc byte [current]
-					pop rdi
+					pop rsi
 					pop rdx
 					pop rax
 
