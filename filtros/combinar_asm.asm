@@ -55,7 +55,7 @@ combinar_asm:
 
 	mov rdi, 1024
 	call malloc
-	mov puntero, rax
+	mov [puntero], rax
 
 	pop r9
 	pop r8
@@ -100,9 +100,11 @@ combinar_asm:
 					
 					push rax
 					push rdx
+					push rdi
+					mov rdi, [current]
 					rdtscp  ;; AGREGOOOO!
-					mov rdx, current
-					mov [puntero + rdx*8], rax
+
+					mov [puntero + rdi*8], rax
 
 					movdqu xmm1, [rdi + 4*r9] ; agarro 4 píxeles de la mitad izquierda de la foto		; xmm1 = p3|p2|p1|p0
 					movdqu xmm2, xmm1
@@ -112,10 +114,11 @@ combinar_asm:
 					
 
 					rdtscp
-					inc current
-					mov rdx, current
-					mov [puntero + rdx*8], rax
-					inc current
+					inc byte [current]
+					mov rdi, [current]
+					mov [puntero + rdi*8], rax
+					inc byte [current]
+					pop rdi
 					pop rdx
 					pop rax
 
