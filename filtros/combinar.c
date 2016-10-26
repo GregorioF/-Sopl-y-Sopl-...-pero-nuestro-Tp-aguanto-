@@ -7,7 +7,7 @@
 
 char* nombre = "tiemposCombinar.csv";
 
-void imprimirArchivo(int n){
+void imprimirArchivo(long long unsigned int n){
 	FILE* pFile = fopen(nombre, "a");
 	fprintf(pFile, "%llu\n", n);
 	fclose(pFile);
