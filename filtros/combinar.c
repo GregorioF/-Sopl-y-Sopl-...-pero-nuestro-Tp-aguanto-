@@ -5,6 +5,15 @@
 
 #include "../tp2.h"
 
+char* nombre = "tiemposCombinar.csv"
+
+void imprimirArchivo(int n){
+	FILE* pFile = fopen(nombre, "a");
+	fprintf(pFile, "%llu\n", n);
+	fclose(pFile);
+}
+
+
 
 void combinar_asm    (unsigned char *src, unsigned char *dst, int cols, int filas,
                       int src_row_size, int dst_row_size, float alpha);
