@@ -55,7 +55,7 @@ combinar_asm:
 
 	mov rdi, 1024
 	call malloc
-	mov puntero, rax
+	mov [puntero], rax
 
 	pop r9
 	pop r8
@@ -112,10 +112,10 @@ combinar_asm:
 					
 
 					rdtscp
-					inc current
+					add [current], 1
 					mov rdx, current
 					mov [puntero + rdx*8], rax
-					inc current
+					add [current], 1
 					pop rdx
 					pop rax
 
