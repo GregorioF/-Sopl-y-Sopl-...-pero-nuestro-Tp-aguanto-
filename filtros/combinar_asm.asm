@@ -28,8 +28,8 @@ extern free
 section .data
 	form: db "%d", 10
 	texto: db "tiemposCombinar.txt", 0
-	puntero: db 0
-	current : db 0
+	puntero: dq 0
+	current : dq 0
 
 section .rodata
 		mascara255: dd 255.0, 255.0, 255.0, 255.0
@@ -55,7 +55,7 @@ combinar_asm:
 
 	mov rdi, 1024
 	call malloc
-	mov [puntero], rax
+	mov puntero, rax
 
 	pop r9
 	pop r8
