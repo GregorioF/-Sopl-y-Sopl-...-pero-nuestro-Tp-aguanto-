@@ -112,10 +112,10 @@ combinar_asm:
 					
 
 					rdtscp
-					add [current], 1
+					inc current
 					mov rdx, current
 					mov [puntero + rdx*8], rax
-					add [current], 1
+					inc current
 					pop rdx
 					pop rax
 
