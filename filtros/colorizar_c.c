@@ -1,6 +1,6 @@
-
 #include "../tp2.h"
 #include <stdio.h>
+
 
 float clamp2(float pixel)
 {

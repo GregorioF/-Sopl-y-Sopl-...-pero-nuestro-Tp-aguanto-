@@ -5,6 +5,7 @@
 
 #include "../tp2.h"
 
+
 void combinar_asm    (unsigned char *src, unsigned char *dst, int cols, int filas,
                       int src_row_size, int dst_row_size, float alpha);
 
