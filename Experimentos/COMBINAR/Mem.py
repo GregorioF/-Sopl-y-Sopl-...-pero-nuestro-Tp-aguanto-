@@ -131,7 +131,7 @@ colors = ['gold', 'lightcoral', 'lightskyblue']
 explode = (0.1, 0)  # explode 1st slice
 
 sizes1 = [leerC,  procesarC, escribirC]
-colors1 = ['yellowgreen','purple','red']
+colors1 = ['gold', 'lightcoral', 'lightskyblue']
  
 # Plot
 
