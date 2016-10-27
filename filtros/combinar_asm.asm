@@ -24,15 +24,13 @@ extern malloc
 extern free
 extern imprimirArchivo
 
-section .data
-	menos1: dd -1.0, -1.0, -1.0, -1.0
-	texto: db "tiemposCombinar.txt", 0
-	current : dq 0
-
 %define puntero [rbp-8]
+%define current rbp-16
 
-section .rodata
+section .data
 		mascara255: dd 255.0, 255.0, 255.0, 255.0
+		menos1: dd -1.0, -1.0, -1.0, -1.0
+		texto: db "tiemposCombinar.txt", 0
 		
 section .text
 
@@ -46,22 +44,26 @@ combinar_asm:
 	push r14
 	push r15
 	sub rsp, 8
-
+	
+	
 	push rdi
 	push rsi
 	push rdx
 	push rcx
 	push r8
-	push r9
-	mov rdi, 10000
+	push r9    ; a
+	mov rdi, 1000000
 	call malloc
 	mov puntero, rax
+	mov qword [current], 0
 	pop r9
 	pop r8
 	pop rcx
 	pop rdx
 	pop rsi
 	pop rdi
+
+
 
 	pxor xmm9, xmm9
 	xor r10, r10 ; pongo un 0 en mi contador de filas
@@ -92,36 +94,54 @@ combinar_asm:
 			.cicloInterno:
 					cmp rbx, rax ; comparo rbx con la cantidad de veces que entran 8 píxeles, con el cociente de la división.
 					je .QuizasFaltaProcesar ; si no es igual falta procesar píxeles en esa fila
-										
-
-					push rax
-					push rdx
-					push rsi
-					push r12
-					mov rsi, [current]
-					rdtscp  ;; AGREGOOOO!
-					
-					mov r12, puntero
-					mov [r12 + rsi*8 ], rax
-
 					movdqu xmm1, [rdi + 4*r9] ; agarro 4 píxeles de la mitad izquierda de la foto		; xmm1 = p3|p2|p1|p0
 					movdqu xmm2, xmm1
 
 					movdqu xmm3, [r11 + 4*r14] ; agarro 4 píxeles de la mitad derecha de la foto		; xmm3 = p7|p6|p5|p4
 					movdqu xmm4, xmm3
 					
-
-					rdtscp
-					inc byte [current]
+					
+					
+					
+					push rax
+					push rcx
+					push rdx
+					push rsi
+					push r15
 					mov rsi, [current]
-					mov r12, puntero
-					mov [r12 + rsi*8 ], rax
-					inc byte [current]
-					pop r12
+					
+					rdtscp  ;; AGREGOOOO!
+					
+					mov r15, puntero
+					mov [r15 + rsi*8 ], rax
+					
+					movdqu xmm1, [rdi + 4*r9] ; agarro 4 píxeles de la mitad izquierda de la foto		; xmm1 = p3|p2|p1|p0
+					movdqu xmm2, xmm1
+
+					movdqu xmm3, [r11 + 4*r14] ; agarro 4 píxeles de la mitad derecha de la foto		; xmm3 = p7|p6|p5|p4
+					movdqu xmm4, xmm3
+					
+					rdtscp
+					
+					add rsi, 1
+					mov [current], rsi 
+					
+					mov r15, puntero
+					mov [r15 + rsi*8 ], rax
+					
+					add rsi, 1
+					mov [current], rsi
+					
+					pop r15
 					pop rsi
 					pop rdx
+					pop rcx
 					pop rax
-
+					
+					
+					
+					
+					
 					punpcklbw xmm1, xmm9 ; | 0 | píxel 1 a | 0 | píxel 1 r | 0 | píxel 1 g | 0 | píxel 1 b | 0 | píxel 0 a | 0 | píxel 0 r | 0 | píxel 0 g | 0 | píxel 0 b |
 					punpckhbw xmm2, xmm9 ; | 0 | píxel 3 a | 0 | píxel 3 r | 0 | píxel 3 g | 0 | píxel 3 b | 0 | píxel 2 a | 0 | píxel 2 r | 0 | píxel 2 g | 0 | píxel 2 b |
 					punpcklbw xmm3, xmm9 ; | 0 | píxel 5 a | 0 | píxel 5 r | 0 | píxel 5 g | 0 | píxel 5 b | 0 | píxel 4 a | 0 | píxel 4 r | 0 | píxel 4 g | 0 | píxel 4 b |
@@ -321,25 +341,22 @@ combinar_asm:
 		jmp .cicloExterno
 
 .fin:
-
-
-	mov rcx, current
+	
+	mov rcx, [current]
 	xor rax, rax
 	mov rdi, puntero
-	
-
+		sub rcx, 1
 		.cicle:
-			
-			dec rcx
-			mov r8, [rdi + rcx*8]
-			dec rcx
-			mov r9, [rdi + rcx*8]
 
+			mov r8, [rdi + rcx*8]
+			sub rcx, 1
+			mov r9, [rdi + rcx*8]
+			sub rcx, 1
+			
 			sub r8, r9
 			add rax, r8
 			cmp rcx, 0
-	
-			jne .cicle 
+			jle .cicle 
 
 		;;EN RAX TENGO EL TOTAL DE TIEMPO INSUMIDO PARA ESCRIBIR!
 
@@ -348,6 +365,7 @@ combinar_asm:
 
 		mov rdi, puntero
 		call free
+
 
 		add rsp, 8
 		pop r15
