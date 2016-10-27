@@ -26,14 +26,13 @@ extern free
 
 
 section .data
-	form: db "%d", 10
 	texto: db "tiemposCombinar.txt", 0
 	puntero: dq 0
 	current : dq 0
-
+	menos1: dd -1.0, -1.0, -1.0, -1.0
+	
 section .rodata
 		mascara255: dd 255.0, 255.0, 255.0, 255.0
-		menos1: dd -1.0, -1.0, -1.0, -1.0
 
 section .text
 
