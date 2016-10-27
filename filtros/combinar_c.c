@@ -32,24 +32,23 @@ void combinar_c (unsigned char *src, unsigned char *dst, int cols, int filas, in
 	for(int f = 0; f<filas; f++){
 		for(int c = 0; c<cols; c++){
 			
-			volatile unsigned long long start, end;
-			MEDIR_TIEMPO_START(start);
-			
 			//lectura:
 			bgra_t *p_sa = (bgra_t*) &src_matrix[f][c * 4];
 			bgra_t *p_sb = (bgra_t*) &src_matrix[f][(cols - c -1) * 4];
 			bgra_t *p_d = (bgra_t*) &dst_matrix[f][c * 4];
+			
+			volatile unsigned long long start, end;
+			MEDIR_TIEMPO_START(start);
 
-			MEDIR_TIEMPO_STOP(end);
-			cant_ciclos += end-start;
-			
-			
 			// precesamiento:
 			float n = clamp(combine(p_sa->b, p_sb->b, alpha));
 			float n2 = clamp(combine(p_sa->g, p_sb->g, alpha));
 			float n3 = clamp(combine(p_sa->r, p_sb->r, alpha));
 			float n4 = clamp(combine(p_sa->a, p_sb->a, alpha));
 			
+			MEDIR_TIEMPO_STOP(end);
+			cant_ciclos += end-start;
+
 			//escritura:
 			
 			p_d->b = n;
