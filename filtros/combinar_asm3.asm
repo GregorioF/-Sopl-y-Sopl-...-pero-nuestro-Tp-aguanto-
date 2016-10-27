@@ -21,9 +21,12 @@ global combinar_asm
 
 extern combinar_c
 
+section .data
+	menos1: dd -1.0, -1.0, -1.0, -1.0
+
 section .rodata
 		mascara255: dd 255.0, 255.0, 255.0, 255.0
-		menos1: dd -1.0, -1.0, -1.0, -1.0
+		
 
 section .text
 

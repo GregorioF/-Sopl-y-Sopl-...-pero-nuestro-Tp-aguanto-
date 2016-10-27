@@ -5,7 +5,7 @@
 
 #include "../tp2.h"
 
-/*
+
 char* nombre = "tiemposCombinar.csv";
 
 void imprimirArchivo(long long unsigned int n){
@@ -14,7 +14,6 @@ void imprimirArchivo(long long unsigned int n){
 	fclose(pFile);
 }
 
-*/
 
 void combinar_asm    (unsigned char *src, unsigned char *dst, int cols, int filas,
                       int src_row_size, int dst_row_size, float alpha);
