@@ -329,14 +329,16 @@ combinar_asm:
 	
 
 		.cicle:
-			dec rcx ;;;;
+			
+			dec rcx
 			mov r8, [rdi + rcx*8]
 			dec rcx
 			mov r9, [rdi + rcx*8]
-			;;dec rcx
+
 			sub r8, r9
 			add rax, r8
 			cmp rcx, 0
+	
 			jne .cicle 
 
 		;;EN RAX TENGO EL TOTAL DE TIEMPO INSUMIDO PARA ESCRIBIR!
