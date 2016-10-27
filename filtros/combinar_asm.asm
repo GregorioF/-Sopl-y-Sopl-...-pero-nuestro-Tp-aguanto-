@@ -21,6 +21,11 @@ global combinar_asm
 
 extern combinar_c
 extern malloc
+extern imprimirArchivo
+
+section .data
+	texto: db "tiemposCombinar.txt", 0
+	current : dq 0
 
 %define puntero [rbp-8]
 
@@ -86,11 +91,32 @@ combinar_asm:
 			.cicloInterno:
 					cmp rbx, rax ; comparo rbx con la cantidad de veces que entran 8 píxeles, con el cociente de la división.
 					je .QuizasFaltaProcesar ; si no es igual falta procesar píxeles en esa fila
+										
+
+					push rax
+					push rdx
+					push rsi
+					mov rsi, [current]
+					rdtscp  ;; AGREGOOOO!
+
+					mov [puntero + rsi*8], rax
+
 					movdqu xmm1, [rdi + 4*r9] ; agarro 4 píxeles de la mitad izquierda de la foto		; xmm1 = p3|p2|p1|p0
 					movdqu xmm2, xmm1
 
 					movdqu xmm3, [r11 + 4*r14] ; agarro 4 píxeles de la mitad derecha de la foto		; xmm3 = p7|p6|p5|p4
 					movdqu xmm4, xmm3
+					
+
+					rdtscp
+					inc byte [current]
+					mov rsi, [current]
+					mov [puntero + rsi*8], rax
+					inc byte [current]
+					pop rsi
+					pop rdx
+					pop rax
+
 					punpcklbw xmm1, xmm9 ; | 0 | píxel 1 a | 0 | píxel 1 r | 0 | píxel 1 g | 0 | píxel 1 b | 0 | píxel 0 a | 0 | píxel 0 r | 0 | píxel 0 g | 0 | píxel 0 b |
 					punpckhbw xmm2, xmm9 ; | 0 | píxel 3 a | 0 | píxel 3 r | 0 | píxel 3 g | 0 | píxel 3 b | 0 | píxel 2 a | 0 | píxel 2 r | 0 | píxel 2 g | 0 | píxel 2 b |
 					punpcklbw xmm3, xmm9 ; | 0 | píxel 5 a | 0 | píxel 5 r | 0 | píxel 5 g | 0 | píxel 5 b | 0 | píxel 4 a | 0 | píxel 4 r | 0 | píxel 4 g | 0 | píxel 4 b |
@@ -290,6 +316,30 @@ combinar_asm:
 		jmp .cicloExterno
 
 .fin:
+
+
+	mov rcx, current
+	xor rax, rax
+
+		.cicle:
+
+			dec rcx
+			mov r8, [puntero + rcx*8]
+			dec rcx
+			mov r9, [puntero + rcx*8]
+			sub r8, r9
+			add rax, r8
+			cmp rcx, 0
+			jne .cicle 
+
+		;;EN RAX TENGO EL TOTAL DE TIEMPO INSUMIDO PARA ESCRIBIR!
+
+		mov rdi, rax
+		call imprimirArchivo
+
+		mov rdi, puntero
+		call free
+
 		add rsp, 8
 		pop r15
 		pop r14
