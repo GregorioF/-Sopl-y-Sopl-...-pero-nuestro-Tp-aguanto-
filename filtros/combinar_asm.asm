@@ -326,13 +326,14 @@ combinar_asm:
 	mov rcx, current
 	xor rax, rax
 	mov rdi, puntero
+	dec rcx
 
 		.cicle:
 
-			dec rcx
 			mov r8, [rdi + rcx*8]
 			dec rcx
 			mov r9, [rdi + rcx*8]
+			dec rcx
 			sub r8, r9
 			add rax, r8
 			cmp rcx, 0
