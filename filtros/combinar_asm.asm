@@ -280,3 +280,9 @@ combinar_asm:
 		pop rbp
 		ret
 
+
+
+
+
+
+	;	al de la izquierda le resto 2 y al otro le sumo 2
