@@ -31,8 +31,6 @@ void combinar_c (unsigned char *src, unsigned char *dst, int cols, int filas, in
 
 	for(int f = 0; f<filas; f++){
 		for(int c = 0; c<cols; c++){
-
-			cant_iteraciones += 1;
 			
 			volatile unsigned long long start, end;
 			MEDIR_TIEMPO_START(start);
