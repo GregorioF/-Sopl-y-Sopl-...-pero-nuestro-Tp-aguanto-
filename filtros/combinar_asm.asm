@@ -94,14 +94,6 @@ combinar_asm:
 			.cicloInterno:
 					cmp rbx, rax ; comparo rbx con la cantidad de veces que entran 8 píxeles, con el cociente de la división.
 					je .QuizasFaltaProcesar ; si no es igual falta procesar píxeles en esa fila
-					movdqu xmm1, [rdi + 4*r9] ; agarro 4 píxeles de la mitad izquierda de la foto		; xmm1 = p3|p2|p1|p0
-					movdqu xmm2, xmm1
-
-					movdqu xmm3, [r11 + 4*r14] ; agarro 4 píxeles de la mitad derecha de la foto		; xmm3 = p7|p6|p5|p4
-					movdqu xmm4, xmm3
-					
-					
-					
 					
 					push rax
 					push rcx
