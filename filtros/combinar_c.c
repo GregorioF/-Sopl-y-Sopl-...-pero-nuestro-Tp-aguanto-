@@ -27,7 +27,7 @@ void combinar_c (unsigned char *src, unsigned char *dst, int cols, int filas, in
 	unsigned char (*dst_matrix)[dst_row_size] = (unsigned char (*)[dst_row_size]) dst;
 
 	volatile unsigned long long int cant_ciclos = 0;
-	volatile unsigned long long int cant_iteraciones = 0;
+	//volatile unsigned long long int cant_iteraciones = 0;
 
 	for(int f = 0; f<filas; f++){
 		for(int c = 0; c<cols; c++){
@@ -41,6 +41,9 @@ void combinar_c (unsigned char *src, unsigned char *dst, int cols, int filas, in
 			bgra_t *p_sa = (bgra_t*) &src_matrix[f][c * 4];
 			bgra_t *p_sb = (bgra_t*) &src_matrix[f][(cols - c -1) * 4];
 			bgra_t *p_d = (bgra_t*) &dst_matrix[f][c * 4];
+
+			MEDIR_TIEMPO_STOP(end);
+			cant_ciclos += end-start;
 			
 			
 			// precesamiento:
@@ -56,13 +59,10 @@ void combinar_c (unsigned char *src, unsigned char *dst, int cols, int filas, in
 			p_d->r = n3;
 			p_d->a = n4;
 
-			MEDIR_TIEMPO_STOP(end);
-			cant_ciclos += end-start;
-
 		}
 	}
 
-	cant_ciclos = cant_ciclos/cant_iteraciones;
+	//cant_ciclos = cant_ciclos;
 	FILE *pFile = fopen( nam, "a" );
 	fprintf(pFile,"%.3f\n", (float)cant_ciclos);
 	fclose( pFile );
