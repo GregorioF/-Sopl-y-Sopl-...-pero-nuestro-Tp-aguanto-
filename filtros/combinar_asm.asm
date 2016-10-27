@@ -102,27 +102,7 @@ combinar_asm:
 					movdqu xmm3, [r11 + 4*r14] ; agarro 4 píxeles de la mitad derecha de la foto		; xmm3 = p7|p6|p5|p4
 					movdqu xmm4, xmm3
 					
-					push rax
-					push rcx
-					push rdx
-					push rsi
-					push r15
-					mov rsi, [current]
-					
-					rdtscp  ;; AGREGOOOO!
-					
-					mov r15, puntero
-					mov [r15 + rsi*8 ], rax
-					
 										
-					pop r15
-					pop rsi
-					pop rdx
-					pop rcx
-					pop rax
-								
-					
-					
 					punpcklbw xmm1, xmm9 ; | 0 | píxel 1 a | 0 | píxel 1 r | 0 | píxel 1 g | 0 | píxel 1 b | 0 | píxel 0 a | 0 | píxel 0 r | 0 | píxel 0 g | 0 | píxel 0 b |
 					punpckhbw xmm2, xmm9 ; | 0 | píxel 3 a | 0 | píxel 3 r | 0 | píxel 3 g | 0 | píxel 3 b | 0 | píxel 2 a | 0 | píxel 2 r | 0 | píxel 2 g | 0 | píxel 2 b |
 					punpcklbw xmm3, xmm9 ; | 0 | píxel 5 a | 0 | píxel 5 r | 0 | píxel 5 g | 0 | píxel 5 b | 0 | píxel 4 a | 0 | píxel 4 r | 0 | píxel 4 g | 0 | píxel 4 b |
@@ -230,34 +210,42 @@ combinar_asm:
 					packusdw xmm8, xmm15 ; empaqueto de dw a w, xmm8 == pixel de xmm15, es decir, el pixel 0, seguido del pixel de xmm8, el 1
 					packuswb xmm7, xmm8 ; empaqueto de w a b, xmm7 == pixel 0, pixel 1, pixel 2, pixel 3
 
+
 					push rax
 					push rcx
 					push rdx
-					push rsi
+					push rdi
 					push r15
-					mov rsi, [current]
-					add rsi, 1
+					mov rdi, [current]
 					
 					rdtscp  ;; AGREGOOOO!
 					
 					mov r15, puntero
-					mov [r15 + rsi*8 ], rax
-					
-					mov [current], rsi
-										
-					pop r15
-					pop rsi
-					pop rdx
-					pop rcx
-					pop rax
-					
+					mov [r15 + rdi*8 ], rax
 
 ; ============ Pongo en la imagen destino en la mitad izquierda de la imagen =======================
 					movdqu [rsi + 4*r9], xmm11
 
 ; ============ Pongo en la imagen destino en la mitad derecha de la imagen =======================
 					movdqu [r12 + 4*r14], xmm7
+					
 
+					add rdi, 1
+					
+					rdtscp  ;; AGREGOOOO!
+					
+					mov r15, puntero
+					mov [r15 + rdi*8 ], rax
+					
+					mov [current], rdi
+										
+					pop r15
+					pop rdi
+					pop rdx
+					pop rcx
+					pop rax
+
+					
 					add r9, 4 ; como cada vez se procesan 4 píxeles de la imagen destino, se avanzan 4 columnas
 					mov r14, r9
 					imul r14, -1
