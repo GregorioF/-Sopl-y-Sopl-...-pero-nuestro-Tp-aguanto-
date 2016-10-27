@@ -117,7 +117,7 @@ combinar_asm:
 					mov r12, puntero
 					mov [r12 + rsi*8 ], rax
 					inc byte [current]
-					pop r11
+					pop r12
 					pop rsi
 					pop rdx
 					pop rax
