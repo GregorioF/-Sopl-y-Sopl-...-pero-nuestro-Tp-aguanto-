@@ -21,6 +21,7 @@ global combinar_asm
 
 extern combinar_c
 extern malloc
+extern free
 extern imprimirArchivo
 
 section .data
