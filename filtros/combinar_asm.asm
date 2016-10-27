@@ -95,6 +95,13 @@ combinar_asm:
 					cmp rbx, rax ; comparo rbx con la cantidad de veces que entran 8 píxeles, con el cociente de la división.
 					je .QuizasFaltaProcesar ; si no es igual falta procesar píxeles en esa fila
 					
+										
+					movdqu xmm1, [rdi + 4*r9] ; agarro 4 píxeles de la mitad izquierda de la foto		; xmm1 = p3|p2|p1|p0
+					movdqu xmm2, xmm1
+
+					movdqu xmm3, [r11 + 4*r14] ; agarro 4 píxeles de la mitad derecha de la foto		; xmm3 = p7|p6|p5|p4
+					movdqu xmm4, xmm3
+					
 					push rax
 					push rcx
 					push rdx
@@ -107,31 +114,13 @@ combinar_asm:
 					mov r15, puntero
 					mov [r15 + rsi*8 ], rax
 					
-					movdqu xmm1, [rdi + 4*r9] ; agarro 4 píxeles de la mitad izquierda de la foto		; xmm1 = p3|p2|p1|p0
-					movdqu xmm2, xmm1
-
-					movdqu xmm3, [r11 + 4*r14] ; agarro 4 píxeles de la mitad derecha de la foto		; xmm3 = p7|p6|p5|p4
-					movdqu xmm4, xmm3
-					
-					rdtscp
-					
-					add rsi, 1
-					mov [current], rsi 
-					
-					mov r15, puntero
-					mov [r15 + rsi*8 ], rax
-					
-					add rsi, 1
-					mov [current], rsi
-					
+										
 					pop r15
 					pop rsi
 					pop rdx
 					pop rcx
 					pop rax
-					
-					
-					
+								
 					
 					
 					punpcklbw xmm1, xmm9 ; | 0 | píxel 1 a | 0 | píxel 1 r | 0 | píxel 1 g | 0 | píxel 1 b | 0 | píxel 0 a | 0 | píxel 0 r | 0 | píxel 0 g | 0 | píxel 0 b |
@@ -210,8 +199,7 @@ combinar_asm:
 					packuswb xmm13, xmm11 ; empaqueto de w a b, xmm13 == pixel 0, pixel 1, pixel 2, pixel 3
 					pshufd xmm11, xmm13, 0x1B		; esto porque tienen q ser al revés la de un lado a la del otro!
 
-; ============ Pongo en la imagen destino en la mitad izquierda de la imagen =======================
-					movdqu [rsi + 4*r9], xmm11
+
 
 ; =============== PARA LA PARTE DERECHA =========================
 					mulps xmm15, [menos1] ; uso lo ya multiplicado por alpha y dividido por 255 y lo multiplico por -1.
@@ -241,6 +229,31 @@ combinar_asm:
 					packusdw xmm7, xmm4 ; empaqueto de dw a w, xmm7 == pixel de xmm4, es decir, el pixel 2, seguido del pixel de xmm7, el 3
 					packusdw xmm8, xmm15 ; empaqueto de dw a w, xmm8 == pixel de xmm15, es decir, el pixel 0, seguido del pixel de xmm8, el 1
 					packuswb xmm7, xmm8 ; empaqueto de w a b, xmm7 == pixel 0, pixel 1, pixel 2, pixel 3
+
+					push rax
+					push rcx
+					push rdx
+					push rsi
+					push r15
+					mov rsi, [current]
+					add rsi, 1
+					
+					rdtscp  ;; AGREGOOOO!
+					
+					mov r15, puntero
+					mov [r15 + rsi*8 ], rax
+					
+					mov [current], rsi
+										
+					pop r15
+					pop rsi
+					pop rdx
+					pop rcx
+					pop rax
+					
+
+; ============ Pongo en la imagen destino en la mitad izquierda de la imagen =======================
+					movdqu [rsi + 4*r9], xmm11
 
 ; ============ Pongo en la imagen destino en la mitad derecha de la imagen =======================
 					movdqu [r12 + 4*r14], xmm7
