@@ -93,13 +93,11 @@ for i in range(128):
 
 y = []
 y.append(smallA)
-y.append(smallC)
 y.append(small2)
 y.append(small3)
-y.append(small4)
 
 
-ind = np.arange(5) 
+ind = np.arange(3) 
 width = .75     
 
 fig, ax = plt.subplots()
@@ -109,13 +107,11 @@ ax.set_ylabel('Ciclos')
 ax.set_title('       Diferencias entre Smalltiles ASM y Smalltiles C')
 #ax.set_subtitle(' formas e igual cantidad de pixeles')
 ax.set_xticks(ind + 0.4)
-ax.set_xticklabels(('ASM','C','O2','O3','O4'))
+ax.set_xticklabels(('ASM','O2','O3'))
 plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
 rects1[0].set_color('b')
 rects1[1].set_color('r')
 rects1[2].set_color('g')
-rects1[3].set_color('y')
-rects1[4].set_color('c')
 plt.grid(True)
 
 plt.ylim(250000,12080000)
