@@ -53,19 +53,19 @@ Luego se guarda en memoria en la imagen destino, se incrementa el contador en 4 
 \par{Efectivamente vimos una notoria diferencia entre el código en ASM con y sin SIMD, más aún, el código optimizado de C es más eficiente que éste último.}
 \par{A continuación adjuntamos un gráfico en el que se puede apreciar dicha diferencia.}
 	
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \captionsetup{justification=centering}
-	\includegraphics[width = 15 cm, height = 8 cm]{imagenes/SinSIMD.png}
+	\includegraphics[width = 12 cm, height = 8 cm]{imagenes/SinSIMD.png}
 \caption[center]{Gráfico que compara las velocidad de las ejecuciones de las implementaciones con y sin el uso de instrucciones SSE, y también con optimizaciones de la implementación en C.}
 \end{figure}
 
 \par{El gráfico se armó en base a un conjunto de corridas de cada implementación del filtro, de donde se tomó la cantidad mínima de ciclos; con esto buscamos reducir la proporción de tiempo que consideramos que nuestro programa no estaba corriendo, si no que el scheduler estaba ejecutando otro programa.}\\
 \par{A continuación mostramos un gráfico (armado de igual manera que el anterior) donde mostramos los tiempos de ejecución del filtro implementado en ASM y en C con distintas optimizaciones.}
 	
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \captionsetup{justification=centering}
-\includegraphics[width = 15 cm, height = 8 cm]{imagenes/rotarConC.png}
+\includegraphics[width = 13 cm, height = 8 cm]{imagenes/rotarConC.png}
 \caption[center]{Diferencias en cantidad de ciclos para la ejecución del filtro con la implementación en ASM y la de C con sus optimizaciones.}
 \end{figure}
