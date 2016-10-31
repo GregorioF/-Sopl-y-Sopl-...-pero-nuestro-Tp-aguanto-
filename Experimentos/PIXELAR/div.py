@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
  
 y = []
-y.append(1380990)
-y.append(71138704)
+y.append(352064)
+y.append(880225)
 
 ind = np.arange(2) 
 width = .75     
@@ -12,15 +12,17 @@ fig, ax = plt.subplots()
 rects1 = ax.bar(ind, y, width)
 
 ax.set_ylabel('Ciclos')
-ax.set_title('       Diferencias entre Combinar ASM y Combinar C')
+ax.set_title('       Pixelar ASM')
 #ax.set_subtitle(' formas e igual cantidad de pixeles')
 ax.set_xticks(ind + 0.4)
-ax.set_xticklabels(('ASM','O3'))
+ax.set_xticklabels(('DIV SHIFT','DIV FLOAT'))
+plt.text(0.25, 359999, r'%100')
+
+plt.text(1.25, 889999, r'%250')
 plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
-plt.text(0.25, 1380999, r'%2')
-plt.text(1.25, 71138799, r'%100')
-rects1[0].set_color('c')
-rects1[1].set_color('r')
+rects1[0].set_color('g')
+rects1[1].set_color('m')
+
 
 plt.grid(False)
 

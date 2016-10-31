@@ -125,12 +125,12 @@ import numpy as np
 
 fig, (ax1, ax2) = plt.subplots(1, 2)
 
-labels = 'Escribir', 'Leer', 'Procesar'
-sizes = [escribir, leer, procesar]
+labels = 'Escribir', 'Procesar', 'Leer'
+sizes = [escribir, procesar, leer]
 colors = ['gold', 'lightcoral', 'lightskyblue']
 explode = (0.1, 0)  # explode 1st slice
 
-sizes1 = [leerC,  procesarC, escribirC]
+sizes1 = [escribirC, procesarC, leerC]
 colors1 = ['gold', 'lightcoral', 'lightskyblue']
  
 # Plot
