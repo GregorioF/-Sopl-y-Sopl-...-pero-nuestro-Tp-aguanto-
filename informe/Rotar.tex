@@ -1,5 +1,5 @@
 \section{Rotar canales}
-El filtro consiste en una rotación de canales en cada pixel, como bien indica su nombre. Y la rotación se da de esta manera:
+\par{El filtro consiste en una rotación de canales en cada píxel, como bien indica su nombre. Y la rotación se da de esta manera:}
 \begin{center}
 \textbf{R} $\longrightarrow$ \textbf{G}\\
 \textbf{G} $\longrightarrow$ \textbf{B}\\
@@ -7,8 +7,8 @@ El filtro consiste en una rotación de canales en cada pixel, como bien indica s
 \end{center}
 
 \subsection{Código C}
-En el código de C recorremos la matriz iterando sus filas y columnas y modificando un pixel a la vez.
-A continuación presentamos su pseudocódigo
+\par{En el código de C recorremos la matriz iterando sus filas y columnas y modificando un píxel a la vez.
+A continuación presentamos su pseudocódigo}
 
 \begin{algorithm}[h!]
 \caption{Rotar}
@@ -32,41 +32,40 @@ A continuación presentamos su pseudocódigo
 \end{algorithm}
 	
 \subsection{Código ASM}
-El código de ASM recorre la matriz de la misma manera que la recorre el código de C, pero procesa 4 pixeles por iteración.
-Las instrucciones propias de SIMD aceleran mucho el proceso y aportan mejoras considerables incluso al compararlo con un código de ASM sin utilizarlas.
+\par{El código de ASM recorre la matriz de la misma manera que la recorre el código de C, pero procesa 4 píxeles por iteración.}
+\par{Las instrucciones propias de SIMD aceleran mucho el proceso y aportan mejoras considerables incluso al compararlo con un código de ASM sin utilizarlas.}
 
-En cada ciclo se cargan 4 pixeles en xmm0 y se aplica \textbf{pshufb xmm0, xmm3}, donde este es:
+En cada ciclo se cargan 4 píxeles en xmm0 y se aplica \textbf{pshufb xmm0, xmm3}, donde este es:
 \xmmb{$0f$}{$0c$}{$0e$}{$0d$}{$0b$}{$08$}{$0a$}{$09$}{$07$}{$04$}{$06$}{$05$}{$03$}{$00$}{$02$}{$01$}
 Luego se guarda en memoria en la imagen destino, se incrementa el contador en 4 (procesamos 4 píxeles) y los respectivos punteros a las imagenes en 16 (4 píxeles ocupan 16 bytes).	
 	
 	
 \subsection{Experimentación}
+
 \subsubsection{Idea}	
+\par{Para la experimentación con Rotar notamos la facilidad con la que se codea y procesa el filtro gracias a las instrucciones de SIMD, por ello quisimos ver si, además, generaban alguna optimización sobre un código sin estas herramientas.}
+\par{Luego comparamos la eficiencia de ASM contra el código de C y distintas optimizaciones de este.}
 
-
-Para la experimentación con Rotar notamos la facilidad con la que se codea y procesa el filtro gracias a las instrucciones de SIMD, por ello quisimos ver si, además, generaban alguna optimización sobre un código sin estas herramientas.
-Luego comparamos la eficiencia de ASM contra el código de C y distintas optimizaciones de este.
 \subsubsection{Hipótesis}
-La hipotesis que tuvimos sobre la primera idea era que efectivamente ibamos a notar un cambio ya que ibamos a estar procesando la mitad de pixeles por iteración. También suponíamos que iba a ser más complicado manipular los píxeles al no contar con instrucciones como \textbf{shuffle}, \textbf{unpacked}, \textbf{psrlx} y \textbf{psllx}.
+\par{La hipótesis que tuvimos sobre la primera idea era que efectivamente íbamos a notar un cambio ya que íbamos a estar procesando la mitad de píxeles por iteración. También suponíamos que iba a ser más complicado manipular los píxeles al no contar con instrucciones como \textbf{shuffle}, \textbf{unpacked}, \textbf{psrlx} y \textbf{psllx}.}
 	
 \subsubsection{Resultados}
-	Efectivamente vimos una notaria diferencia entre el código en ASM con y sin SIMD, más aún, el código optimizado de C es más eficiente que éste último.
-	A continuación adjuntamos un gráfico en el que se puede apreciar dicha diferencia.
+\par{Efectivamente vimos una notoria diferencia entre el código en ASM con y sin SIMD, más aún, el código optimizado de C es más eficiente que éste último.}
+\par{A continuación adjuntamos un gráfico en el que se puede apreciar dicha diferencia.}
 	
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \captionsetup{justification=centering}
-	\includegraphics[width = 15 cm, height = 8 cm]{imagenes/SinSIMD.png}
+	\includegraphics[width = 12 cm, height = 8 cm]{imagenes/SinSIMD.png}
 \caption[center]{Gráfico que compara las velocidad de las ejecuciones de las implementaciones con y sin el uso de instrucciones SSE, y también con optimizaciones de la implementación en C.}
 \end{figure}
 
-	El gráfico se armó en base a un conjunto de corridas de cada implementación del filtro, de donde se tomó la cantidad mínima de ciclos; con esto buscamos reducir la proporción de tiempo que consideramos que nuestro programa no estaba corriendo, si no que el scheduler estaba ejecutando otro programa.
+\par{El gráfico se armó en base a un conjunto de corridas de cada implementación del filtro, de donde se tomó la cantidad mínima de ciclos; con esto buscamos reducir la proporción de tiempo que consideramos que nuestro programa no estaba corriendo, si no que el scheduler estaba ejecutando otro programa.}\\
+\par{A continuación mostramos un gráfico (armado de igual manera que el anterior) donde mostramos los tiempos de ejecución del filtro implementado en ASM y en C con distintas optimizaciones.}
 	
-	A continuación mostramos un gráfico (armado de igual manera que el anterior) donde mostramos los tiempos de ejecución del filtro implementado en ASM y en C con distintas optimizaciones.
-	
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \captionsetup{justification=centering}
-\includegraphics[width = 15 cm, height = 8 cm]{imagenes/rotarConC.png}
+\includegraphics[width = 13 cm, height = 8 cm]{imagenes/rotarConC.png}
 \caption[center]{Diferencias en cantidad de ciclos para la ejecución del filtro con la implementación en ASM y la de C con sus optimizaciones.}
 \end{figure}
