@@ -47,46 +47,71 @@ with open(data4_csv) as csvfile:
     
     tsO3[14].append(pixO3)
 
-
-asm = 10000000000000000
+ind = 0
+asm = 0
+asmA = []
 for i in range(128):
 	for t in tsASM[i]:
-		asm = min(asm, t)
-
-c = 10000000000000000
+		asmA.append(t)
+		ind = ind + 1
+		asm = asm+t
+		
+asm = asm/ind
+cA = []
+ind = 0
+c = 0
 for i in range(128):
 	for t in tsC[i]:
-		c = min(c, t)
-
-o2 = 10000000000000000
+		cA.append(t)
+		c = c+t
+		ind = ind + 1
+		
+c = c/ind
+o2A = []
+ind = 0
+o2 = 0
 for i in range(128):
 	for t in tsO2[i]:
-		o2 = min(o2, t)
+		o2A.append(t)
+		o2 = o2 + t
+		ind = ind + 1
+		
+o2 = o2/ind
+o3A = []
+ind = 0
 
-
-o3 = 10000000000000000
+o3 = 0
 for i in range(128):
 	for t in tsO3[i]:
-		o3 = min(o3, t)
+		o3A.append(t)
+		o3 = o3 + t
+		ind = ind + 1
+		
+o3 = o3/ind
  
+stdd = []
+stdd.append(np.std(asmA))
+#stdd.append(np.std(cA))
+#stdd.append(np.std(o2A))
+stdd.append(np.std(o3A))
 
 y = []
 y.append(asm)
-y.append(c)
+#y.append(c)
 #y.append(o2)
-#y.append(o3)
+y.append(o3)
 
 ind = np.arange(2) 
 width = .5     
 
 fig, ax = plt.subplots()
-rects1 = ax.bar(ind, y, width)
+rects1 = ax.bar(ind, y, width, yerr = stdd)
 
 ax.set_ylabel('Ciclos')
-ax.set_title('       Pixelar ASM y Pixelar C')
+ax.set_title('       Pixelar ASM y Pixelar C Optimizado')
 #ax.set_subtitle(' formas e igual cantidad de pixeles')
 ax.set_xticks(ind + 0.4)
-ax.set_xticklabels(('ASM', 'C'))
+ax.set_xticklabels(('ASM', 'O3:CONTROL'))
 plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
 
 plt.text(1.25, 14199999, r'%100')

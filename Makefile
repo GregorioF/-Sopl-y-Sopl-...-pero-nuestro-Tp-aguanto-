@@ -1,7 +1,7 @@
 
 #CFLAGS64 = -ggdb -Wall -Wno-unused-parameter -Wextra -std=c99 -pedantic -m64
-CFLAGS64 = -O3 -msse -Wall -std=c99 -pedantic -m64
-#CFLAGS64 = -ggdb  -std=c99 -pedantic -m64
+#CFLAGS64 = -O3 -Wall -std=c99 -pedantic -m64
+CFLAGS64 = -ggdb  -std=c99 -pedantic -m64
 
 
 CFLAGS   = $(CFLAGS64)

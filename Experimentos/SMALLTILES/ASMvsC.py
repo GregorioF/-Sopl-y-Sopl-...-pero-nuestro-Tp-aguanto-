@@ -7,7 +7,7 @@ ts = [ [] for i in range(128)]
 with open(data_csv) as csvfile:
   reader = csv.DictReader(csvfile)
   for row in reader:
-    smalA = int(row['small'])
+    smalA = float(row['small'])
     
     ts[30].append(smalA)
 
@@ -18,7 +18,7 @@ ts5 = [ [] for i in range(128)]
 with open(data5_csv) as csvfile:
   reader = csv.DictReader(csvfile)
   for row in reader:
-    smalC = int(row['small'])
+    smalC = float(row['small'])
     
     ts5[23].append(smalC)
 
@@ -57,26 +57,43 @@ with open(data4_csv) as csvfile:
 import matplotlib.pyplot as plt
 import numpy as np
 
-
-smallA = 10000000000000000000
+ind = 0
+a = []
+smallA = 0
 for i in range(128):
   for t in ts[i]:
-    smallA = min(smallA, t)
+	  ind = ind + 1
+	  smallA = smallA + t
+	  a.append(t)
 
+stdA = np.std(a)
+smallA = smallA/ind
 
-small2 = 10000000000000000000
+s2 = []
+ind = 0
+small2 = 0
 for i in range(128):
   for t in ts2[i]:
-    small2 = min(small2,t)
+	  ind = ind + 1
+	  small2 = small2 + t
+	  s2.append(t)
+
+std2 = np.std(s2)
+small2 = small2/ind
 
 
+s3 = []
 
-small3 = 10000000000000000000
+ind = 0
+small3 = 0
 for i in range(128):
   for t in ts3[i]:
-    small3 = min(small3, t)
+	  ind = ind + 1
+	  small3 = small3 + t
+	  s3.append(t)
 
-
+small3 = small3/ind
+std3 = np.std(s3)
 
 small4 = 10000000000000000000
 for i in range(128):
@@ -96,25 +113,37 @@ y.append(smallA)
 y.append(small2)
 y.append(small3)
 
+stdd = []
+
+stdd.append(stdA)
+stdd.append(std2)
+stdd.append(std3)
 
 ind = np.arange(3) 
 width = .75     
 
 fig, ax = plt.subplots()
-rects1 = ax.bar(ind, y, width)
+rects1 = ax.bar(ind, y, width, yerr = stdd)
 
 ax.set_ylabel('Ciclos')
 ax.set_title('       Diferencias entre Smalltiles ASM y Smalltiles C')
 #ax.set_subtitle(' formas e igual cantidad de pixeles')
 ax.set_xticks(ind + 0.4)
-ax.set_xticklabels(('ASM','O2','O3'))
+ax.set_xticklabels(('ASM','O2','O3:CONTROL'))
 plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
 rects1[0].set_color('b')
 rects1[1].set_color('r')
 rects1[2].set_color('g')
-plt.grid(True)
-
-plt.ylim(250000,12080000)
-
+plt.grid(linestyle = 'dotted')
+print(small2)
+print(small3)
+print((smallA*100)/small3)
+print((small2*100)/small3)
+print((smallC*100)/small3)
+plt.text(0.25, 530000, r'%15')
+plt.text(1.25, 4312981, r'%130')
+plt.text(2.25, 3317645, r'%100')
+plt.text(0.17, 5000000, 'O0 : %372',
+        bbox={'facecolor':'white', 'alpha':0.5, 'pad':10})
 plt.show()
 
