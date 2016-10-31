@@ -43,7 +43,7 @@ filtro_t filtros[] = {
 	{0,0,0,0,0}
 };
 
-char* name = "smalltiles03.csv";
+char* name = "combinar.csv";
 
 // ~~~ fin de seteo de filtros. Para agregar otro debe agregarse ~~~
 //    ~~~ una linea en cada una de las tres partes anteriores ~~~
