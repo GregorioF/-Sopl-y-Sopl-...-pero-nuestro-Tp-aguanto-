@@ -1,8 +1,8 @@
 \section{Smalltiles}
-Este filtro consiste en replicar 4 veces la imagen original achicada. De esta manera, si enumeramos los píxeles a partir del 0, siempre estaremos utiplizando los píxeles de número par de la imagen original para generar las 4 más pequeñas.
+\par{Este filtro consiste en replicar 4 veces la imagen original achicada. De esta manera, si enumeramos los píxeles a partir del 0, siempre estaremos utilizando los píxeles de número par de la imagen original para generar las 4 más pequeñas.}
 \subsection{Código C}
-	En el código de C recorremos el equivalente a una de las 4 fotos pequeñas. En el píxel de la posición \emph{(i,j)} guardamos el contenido del de la posición \emph{(2*i,2*j)} en la imagen original. A la vez cargamos este contenido en las otras 3 imagenes.
-	A continuación mostramos el pseudocódigo de Smalltiles:
+\par{En el código de C recorremos el equivalente a una de las 4 fotos pequeñas. En el píxel de la posición \emph{(i,j)} guardamos el contenido del de la posición \emph{(2*i,2*j)} en la imagen original. A la vez cargamos este contenido en las otras 3 imágenes.}
+\par{A continuación mostramos el pseudocódigo de Smalltiles:}
 \begin{algorithm}[h!]
 \caption{Smalltiles}
 \begin{algorithmic}
@@ -40,10 +40,9 @@ Este filtro consiste en replicar 4 veces la imagen original achicada. De esta ma
 \end{algorithm}
 	
 \subsection{Código ASM}
-	
-	En la implementación de ASM recorremos las filas de la imagen; tenemos dos ciclos, el interno recorre una fila iterando sobre sus columnas, y el externo itera sobre todas las filas de la imagen.\\
-	En el ciclo interno cargamos 8 píxeles, nos encargamos de ubicarlos en un registro xmmi a nuestra conveniencia utilizando \textbf{pshufd}, \textbf{psrldq}, \textbf{pslldq} y \textbf{paddb}.\\
-	En un principio cargamos los primeros 4 píxeles en \textbf{xmm1} y luego \textbf{pshud xmm1, xmm1,0xd8}. \\
+\par{En la implementación de ASM recorremos las filas de la imagen; tenemos dos ciclos, el interno recorre una fila iterando sobre sus columnas, y el externo itera sobre todas las filas de la imagen.}
+\par{En el ciclo interno cargamos 8 píxeles, nos encargamos de ubicarlos en un registro xmmi a nuestra conveniencia utilizando \textbf{pshufd}, \textbf{psrldq}, \textbf{pslldq} y \textbf{paddb}.}
+\par{En un principio cargamos los primeros 4 píxeles en \textbf{xmm1} y luego \textbf{pshud xmm1, xmm1,0xd8}.}
 	\textbf{xmm1:}
 	\xmmdw{$pixel4$}{$pixel2$}{$pixel3$}{$pixel1$}
 	Luego cargamos los siguientes 4 píxeles en xmm10 y también \textbf{pshud xmm10,xmm10, 0x2d}.\\
@@ -53,25 +52,26 @@ Este filtro consiste en replicar 4 veces la imagen original achicada. De esta ma
 	\textbf{xmm10:}
 	\xmmdw{$pixel8$}{$pixel6$}{$pixel4$}{$pixel2$}
 	Ya tenemos en \textbf{xmm10} la información tal cual queremos guardarla, ahora simplemente la guardamos en memoria manipulando algunos ínidices para cargarla en los 4 cuadrantes de la imagen destino.
+	
 \subsection{Experimentación}
 
 \subsubsection{Idea}
-Nuestra implementación de ASM consiste en un ciclo que itera sobre las filas, por ende tuvimos la idea de experimentar sobre eso. Es decir, la cantidad de filas es un factor clave que influye bastante en la cantidad de ciclos de ejecución del filtro. Entonces nuestro experimento se basó en analizar los distintos tiempos de ejecución de imagenes con igual cantidad de píxeles totales, pero con distinto ancho y largo.
+\par{Nuestra implementación de ASM consiste en un ciclo que itera sobre las filas, por ende tuvimos la idea de experimentar sobre eso. Es decir, la cantidad de filas es un factor clave que influye bastante en la cantidad de ciclos de ejecución del filtro. Entonces nuestro experimento se basó en analizar los distintos tiempos de ejecución de imágenes con igual cantidad de píxeles totales, pero con distinto ancho y largo.}
+
 \subsubsection{Hipótesis}
-	Al comparar dos imagenes donde el ancho de una es la altura de la otra y viceversa, la aplicación del filtro a la imagen con menor altura tomaría menos ciclos. Cuanto más cercanos sean los valores de altura y ancho, menos varía la cantidad de ciclos.
+\par{Al comparar dos imágenes donde el ancho de una es la altura de la otra y viceversa, la aplicación del filtro a la imagen con menor altura tomaría menos ciclos. Cuanto más cercanos sean los valores de altura y ancho, menos varía la cantidad de ciclos.}
 	
 \subsubsection{Resultados}
-	Efectivamente eso es lo que podemos observar en el siguiente gráfico. La cantidad de ciclos varía más en las imagenes de 200x1600 y 1600x200, donde podemos observar una diferencia de más de 4 millones de ciclos. En cambio en el par de imagenes de 640x500 y 500x640 la diferencia es de tan solo 1 millón y medio (exactamente 155981 ciclos). Estos experimentos se realizaron con la misma imagen rotada y sin rotar, aunque en el caso de este filtro, las cualidades de los píxeles no modifican los resultados.
+\par{Efectivamente eso es lo que podemos observar en el siguiente gráfico. La cantidad de ciclos varía más en las imágenes de 200x1600 y 1600x200, donde podemos observar una diferencia de más de 4 millones de ciclos. En cambio en el par de imágenes de 640x500 y 500x640 la diferencia es de tan solo \textcolor{red}{1 millón y medio} (exactamente \textcolor{red}{155981} ciclos). Estos experimentos se realizaron con la misma imagen rotada y sin rotar, aunque en el caso de este filtro, las cualidades de los píxeles no modifican los resultados.}
 
-\begin{figure}[h!]
+\begin{figure}[H]
 \centering
 \captionsetup{justification=centering}
-\includegraphics[width = 15 cm, height = 8 cm]{imagenes/distintostamanos.png}
+\includegraphics[width = 15 cm, height = 10 cm]{imagenes/distintostamanos.png}
 \caption[center]{Gráfico de barras que da cuenta de los ciclos que implica cada corrida del filtro para imágenes de distintos tamaños con una determinada cantidad fija de píxeles.}
 \end{figure}
 	
-	\newpage
-	A continuación adjuntamos el gráfico que compara la cantidad de ciclos que tarda en ejecutarse el filtro implementado en ASM y el implementado en C.
+\par{A continuación adjuntamos el gráfico que compara la cantidad de ciclos que tarda en ejecutarse el filtro implementado en ASM y el implementado en C.}
 
 \begin{figure}[h!]
 \centering
@@ -79,4 +79,3 @@ Nuestra implementación de ASM consiste en un ciclo que itera sobre las filas, p
 \includegraphics[width = 15 cm, height = 12 cm]{imagenes/ASMvsCSmalltiles.png}
 \caption[center]{Comparación de las implementaciones y compilaciones con distintos niveles de optimización en cuanto a la rapidez para el procesamiento de una imagen.}
 \end{figure}
-	
