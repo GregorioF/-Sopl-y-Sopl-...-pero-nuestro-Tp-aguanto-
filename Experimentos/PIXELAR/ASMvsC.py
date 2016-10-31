@@ -12,7 +12,7 @@ with open(data_csv) as csvfile:
   for row in reader:
     pix = float(row['pixelar'])
     
-    tsASM[13].append(pix)
+    tsASM[66].append(pix)
 
 data2_csv = "pixelarC.csv"
 
@@ -23,18 +23,9 @@ with open(data2_csv) as csvfile:
   for row in reader:
     pixC = float(row['pixelar'])
     
-    tsC[9].append(pixC)
+    tsC[36].append(pixC)
 
-data3_csv = "pixelarO2.csv"
 
-tsO2 = [ [] for i in range(128)]
-
-with open(data3_csv) as csvfile:
-  reader = csv.DictReader(csvfile)
-  for row in reader:
-    pixO2 = float(row['pixelar'])
-    
-    tsO2[6].append(pixO2)
 
 data4_csv = "pixelarO3.csv"
 
@@ -45,7 +36,7 @@ with open(data4_csv) as csvfile:
   for row in reader:
     pixO3 = float(row['pixelar'])
     
-    tsO3[14].append(pixO3)
+    tsO3[57].append(pixO3)
 
 ind = 0
 asm = 0
@@ -67,16 +58,7 @@ for i in range(128):
 		ind = ind + 1
 		
 c = c/ind
-o2A = []
-ind = 0
-o2 = 0
-for i in range(128):
-	for t in tsO2[i]:
-		o2A.append(t)
-		o2 = o2 + t
-		ind = ind + 1
-		
-o2 = o2/ind
+
 o3A = []
 ind = 0
 
@@ -91,15 +73,15 @@ o3 = o3/ind
  
 stdd = []
 stdd.append(np.std(asmA))
-#stdd.append(np.std(cA))
+stdd.append(np.std(cA))
 #stdd.append(np.std(o2A))
-stdd.append(np.std(o3A))
+#stdd.append(np.std(o3A))
 
 y = []
 y.append(asm)
-#y.append(c)
+y.append(c)
 #y.append(o2)
-y.append(o3)
+#y.append(o3)
 
 ind = np.arange(2) 
 width = .5     
@@ -108,19 +90,21 @@ fig, ax = plt.subplots()
 rects1 = ax.bar(ind, y, width, yerr = stdd)
 
 ax.set_ylabel('Ciclos')
-ax.set_title('       Pixelar ASM y Pixelar C Optimizado')
+ax.set_title('       Pixelar ASM y Pixelar C')
 #ax.set_subtitle(' formas e igual cantidad de pixeles')
 ax.set_xticks(ind + 0.4)
-ax.set_xticklabels(('ASM', 'O3:CONTROL'))
+ax.set_xticklabels(('ASM', 'C'))
 plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
 
-plt.text(1.25, 14199999, r'%100')
 
-plt.text(0.25, 620000, r'%4')
+print(c)
+plt.text(1.25, 20000000, r'%100')
+
+plt.text(0.25, 610000, r'%3')
 
 
-rects1[0].set_color('m')
-rects1[1].set_color('b')
+rects1[0].set_color('r')
+rects1[1].set_color('y')
 
 
 
