@@ -49,31 +49,41 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-
-rotar = 100000000000000
+ind = 0
+rotar = 0
 for i in range(128):
   for t in ts[i]:
-    rotar = min(rotar, t)
+    rotar = rotar + t
+    ind = ind + 1
 
+rotar = rotar/ind
 
-
-
-simd = 10000000000000
+ind = 0
+simd = 0
 for i in range(128):
   for t in ts2[i]:
-    simd = min(simd,t)
+    simd = simd + t
+    ind = ind + 1
+    
+simd = simd/ind
 
-   
-o2 = 100000000000000000
+ind = 0
+o2 = 0
 for i in range(128):
   for t in ts3[i]:
-    o2 = min(o2,t)
+	ind = ind +1
+	o2 = o2 + t
+o2 = o2/ind
 
-o3 = 100000000000000000
+
+    
+ind = 0
+o3 = 0
 for i in range(128):
   for t in ts4[i]:
-    o3 = min(o3,t)  
-
+    o3 = o3 + t 
+    ind = ind + 1
+o3 = o3/ind
 
 y = []
 y.append(rotar)
@@ -88,15 +98,19 @@ fig, ax = plt.subplots()
 rects1 = ax.bar(ind, y, width)
 
 ax.set_ylabel('Ciclos')
-ax.set_title('Diferencias de Rotar ASM usando SIMD y no usandolo')
+ax.set_title('Diferencias de Rotar ASM con y sin SIMD')
 ax.set_xticks(ind + 0.4)
-ax.set_xticklabels(('Con SIMD', 'Sin SIMD', 'O2', 'O3'))
+ax.set_xticklabels(('Con SIMD', 'Sin SIMD', 'O2', 'O3:CONTROL'))
 plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
 rects1[0].set_color('m')
 rects1[1].set_color('g')
 rects1[2].set_color('y')
 rects1[3].set_color('r')
-plt.ylim(0,3350000)
-
+#plt.ylim(0,4550000)
+plt.text(3.25, 4700000, r'%100')
+plt.text(1.25, 4450000, r'%94')
+plt.text(2.25, 5150000, r'%109')
+plt.text(0.25, 385000, r'%8')
+#plt.grid(True)
 plt.show()
 
