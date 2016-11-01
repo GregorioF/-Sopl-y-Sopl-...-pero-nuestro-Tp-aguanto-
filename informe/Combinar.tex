@@ -109,6 +109,7 @@ dando lugar a menos cálculos necesarios.
 \par{Se mostrará cómo se genera el píxel $I_{i,j}$ de la imagen resultante.}
 %\xmmb{$P_{j+3}A$}{$P_{j+3}R$}{$P_{j+3}G$}{$P_{j+3}B$}{$P_{j+2}A$}{$P_{j+2}R$}{$P_{j+2}G$}{$P_{j+2}B$}{$P_{j+1}A$}{$P_{j+1}R$}{$P_{j+1}G$}{$P_{j+1}B$}{$P_jA$}{$P_jR$}{$P_jG$}{$P_jB$}
 \par{Se levantan 4 píxeles de la mitad izquierda en el registro XMM1:}
+\\
 \par{\textbf{XMM1:}}
 \xmmb{$A_{j+3}$}{$R_{j+3}$}{$G_{j+3}$}{$B_{j+3}$}{$A_{j+2}$}{$R_{j+2}$}{$G_{j+2}$}{$B_{j+2}$}{$A_{j+1}$}{$R_{j+1}$}{$G_{j+1}$}{$B_{j+1}$}{$A_j$}{$R_j$}{$G_j$}{$B_j$}
 \par{y 4 en espejo de la mitad derecha en XMM3:}\\
@@ -161,12 +162,19 @@ se ejecuta la instrucción \textbf{punpcklbw xmm1, xmm9} que da como resultado
 \par{Por otro lado, se midieron los ciclos de clock relacionados a accesos a memoria con la implementación de ASM y con la de C y se realizaron gráficos de torta para mostrar los porcentajes con respecto al total de ciclos insumidos.}
 
 \subsubsection{Resultados}
-\par{En cuanto a las cantidades totales de ciclos de clock se obtuvo el siguiente gráfico.}
+\par{En cuanto a las cantidades totales de ciclos de clock se obtuvieron los siguientes gráficos.}
 
 \begin{figure}[h!]
 \centering
 \captionsetup{justification=centering}
-	\includegraphics[width = 12 cm, height = 8 cm]{imagenes/CombinarASMvsC.jpeg}
+	\includegraphics[width = 12 cm, height = 8 cm]{imagenes/CombinarASM-Cs.jpeg}
+	\caption[center]{Gráfico de barras comparando las implementaciones y diversas optimizaciones.}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\captionsetup{justification=centering}
+	\includegraphics[width = 12 cm, height = 8 cm]{imagenes/CombinarASMvsC.png}
 	\caption[center]{Gráfico de barras comparando las implementaciones y diversas optimizaciones.}
 \end{figure}
 
@@ -179,7 +187,7 @@ se ejecuta la instrucción \textbf{punpcklbw xmm1, xmm9} que da como resultado
 \begin{figure}[h!]
 \centering
 \captionsetup{justification=centering}
-	\includegraphics[width = 12 cm, height = 8 cm]{imagenes/CombinarMemoria.png}
+	\includegraphics[width = 10 cm, height = 6 cm]{imagenes/CombinarMemoria.png}
 \caption[center]{En estos gráficos se exponen las diferencias en las implementaciones en cuanto a la proporción de tiempo destinado a accesos a memoria y a procesamiento de la imagen.}
 \end{figure}
 
