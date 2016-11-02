@@ -11,59 +11,33 @@ rotar_asm:
 ; rsi = puntero a matriz dst
 ; edx = cantidad de columnas
 ; ecx = cantidad de filas
-
-	push rbp
-	mov rbp, rsp ;a|b|g|r --> a|g|r|b
-	push rbx
-	push r12
-	push r13
-	push r14
-
 	xor rax, rax
 	mov eax, edx	; en eax tengo la cnatidad de columnas
 	mul ecx			; en rax tengo la  cantidad d pilxeles totales
-
-	.ciclo:
+	
+	.HacerMascaras:
+		pxor xmm4, xmm4
+		mov r8, 0x0f0c0e0d0b080a09 	; hago la mascara para shuffle
 		
+		movq xmm3, r8
+		pslldq xmm3, 8
+		mov r8, 0x0704060503000201
+		movq xmm4, r8
+		por xmm3, xmm4	 	; termine de hacer la mascara para shufle si el pixel x era = a|b|g|r ahora con shufle
+							; va a ser igual a  a|g|r|b
+		
+	.ciclo:
 		cmp rax,  0 
 		je .fin
-
-		xor r8, r8
-		xor r9, r9
-		xor r10, r10
-		xor r11, r11
-		xor r12, r12
-		xor r13,r13
-		xor r14,r14
-
-		mov r11b, [rdi]	 ; subo a r10 1 byte a
-		inc rdi  
-		mov r10b, [rdi] ; siguiente byte b
-		inc rdi
-		mov r9b, [rdi] ; g
-		inc rdi
-		mov r8b, [rdi] ;r
-		inc rdi
-
-		mov [rsi], r11b ;a
-		inc rsi	
-		mov [rsi], r9b ;g
-		inc rsi
-		mov [rsi], r8b ;r
-		inc rsi
-		mov [rsi], r10b ;b
-		inc rsi
-
-		sub rax, 1			; procese ya un pixel
-				
+		movdqu xmm0, [rdi]	 ; subo a xmm0 4  pixeles
+		pshufb xmm0, xmm3	; shufleee!
+		;psrldq xmm0, 1
+		movdqu [rsi], xmm0	; reescribo y lesto
+		
+		sub rax, 4			; procese ya cuatro pixeles
+		add rdi, 16
+		add rsi, 16
 		jmp .ciclo
 			
 	.fin:
-
-		pop r14
-		pop r13
-		pop r12
-		pop rbx
-		pop rbp
-		
 		ret

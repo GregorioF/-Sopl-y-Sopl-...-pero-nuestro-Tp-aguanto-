@@ -111,6 +111,8 @@ plt.text(3.25, 4700000, r'%100')
 plt.text(1.25, 4450000, r'%94')
 plt.text(2.25, 5150000, r'%109')
 plt.text(0.25, 385000, r'%8')
+print(rotar*8)
+print(simd)
 #plt.grid(True)
 plt.show()
 
