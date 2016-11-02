@@ -45,13 +45,13 @@ rotar_asm:
 		mov r8b, [rdi] ;a
 		inc rdi
 
-		mov [rsi], r8b ;a
+		mov [rsi], r9b ;b
 		inc rsi	
-		mov [rsi], r10b ;g
-		inc rsi
 		mov [rsi], r11b ;r
 		inc rsi
-		mov [rsi], r9b ;b
+		mov [rsi], r10b ;g
+		inc rsi
+		mov [rsi], r8b ;a
 		inc rsi
 
 		sub rax, 1			; procese ya un pixel
