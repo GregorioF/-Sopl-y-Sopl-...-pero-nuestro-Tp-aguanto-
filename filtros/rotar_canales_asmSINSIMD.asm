@@ -36,25 +36,50 @@ rotar_asm:
 		xor r13,r13
 		xor r14,r14
 
-		mov r11b, [rdi]	 ; subo a r10 1 byte a
-		inc rdi  
-		mov r10b, [rdi] ; siguiente byte b
-		inc rdi
-		mov r9b, [rdi] ; g
-		inc rdi
-		mov r8b, [rdi] ;r
-		inc rdi
+		mov r12, [rdi]	 ; subo a r12 2 pixeles
+		
+		mov r11b, r12b ; subo a r11b un byte
+		shr r12, 8
+		mov r10b, r12b
+		shr r12, 8
+		mov r9b, r12b
+		shr r12, 8
+		mov r8b, r12b
+		shr r12, 8
+		
+		mov r13b, r10b
+		shl r13, 8
+		or r13b, r8b
+		shl r13, 8
+		or r13b, r9b
+		shl r13, 8
+		or r13b, r11b
+		
+		mov r11b, r12b ; subo a r11b un byte
+		shr r12, 8
+		mov r10b, r12b
+		shr r12, 8
+		mov r9b, r12b
+		shr r12, 8
+		mov r8b, r12b
+		
+		mov r14b, r10b
+		shl r14, 8
+		or r14b, r8b
+		shl r14, 8
+		or r14b, r9b
+		shl r14, 8
+		or r14b, r11b
+		
+		shl r14, 32
+		or r14, r13
 
-		mov [rsi], r11b ;a
-		inc rsi	
-		mov [rsi], r9b ;g
-		inc rsi
-		mov [rsi], r8b ;r
-		inc rsi
-		mov [rsi], r10b ;b
-		inc rsi
+		mov [rsi], r14
+		add rsi, 8
+		add rdi, 8
 
-		sub rax, 1			; procese ya un pixel
+
+		sub rax, 2			; procese dos pixeles
 				
 		jmp .ciclo
 			
