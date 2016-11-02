@@ -36,22 +36,22 @@ rotar_asm:
 		xor r13,r13
 		xor r14,r14
 
-		mov r11b, [rdi]	 ; subo a r10 1 byte r
+		mov r11b, [rdi]	 ; subo a r10 1 byte a
 		inc rdi  
-		mov r10b, [rdi] ; siguiente byte g
+		mov r10b, [rdi] ; siguiente byte b
 		inc rdi
-		mov r9b, [rdi] ; b
+		mov r9b, [rdi] ; g
 		inc rdi
-		mov r8b, [rdi] ;a
+		mov r8b, [rdi] ;r
 		inc rdi
 
-		mov [rsi], r9b ;b
+		mov [rsi], r11b ;a
 		inc rsi	
-		mov [rsi], r11b ;r
+		mov [rsi], r9b ;g
 		inc rsi
-		mov [rsi], r10b ;g
+		mov [rsi], r8b ;r
 		inc rsi
-		mov [rsi], r8b ;a
+		mov [rsi], r10b ;b
 		inc rsi
 
 		sub rax, 1			; procese ya un pixel
