@@ -36,15 +36,15 @@ rotar_asm:
 		xor r13,r13
 		xor r14,r14
 
-		mov r12, [rdi]	 ; subo a r10 2 pixeles
+		mov r12, [rdi]	 ; subo a r12 2 pixeles
 		
-		mov r11b, [r12] ; subo a r11b un byte
+		mov r11b, r12b ; subo a r11b un byte
 		shr r12, 8
-		mov r10b, [r12]
+		mov r10b, r12b
 		shr r12, 8
-		mov r9b, [r12]
+		mov r9b, r12b
 		shr r12, 8
-		mov r8b, [r12]
+		mov r8b, r12b
 		shr r12, 8
 		
 		mov r13b, r10b
@@ -55,13 +55,13 @@ rotar_asm:
 		shl r13, 8
 		or r13b, r11b
 		
-		mov r11b, [r12] ; subo a r11b un byte
+		mov r11b, r12b ; subo a r11b un byte
 		shr r12, 8
-		mov r10b, [r12]
+		mov r10b, r12b
 		shr r12, 8
-		mov r9b, [r12]
+		mov r9b, r12b
 		shr r12, 8
-		mov r8b, [r12]
+		mov r8b, r12b
 		
 		mov r14b, r10b
 		shl r14, 8
