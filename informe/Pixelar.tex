@@ -73,19 +73,19 @@
 \subsection{Experimentación 1}
 
 \subsubsection{Idea}	
-\par{Comparamos la eficiencia del código en ASM, el de C y el de C optimizado.}
+\par{Comparamos la eficiencia del código en ASM, \textcolor{red}{el de C y el de C optimizado}.}
 	
 \subsubsection{Resultados}
-	\begin{figure}[h!]
+	\begin{figure}[H]
 	\centering
-	\includegraphics[width = 15 cm, height = 10 cm]{imagenes/ASMvsCPixelar.png}
-	\caption[center]{Comparación $\dfrac{\text{ciclos totales}}{\text{cant. de píxeles}}$ - diferentes implementaciones de C y ASM}
+	\includegraphics[width = 10 cm, height = 6.5 cm]{imagenes/ASMvsCPixelar.png}
+	\caption[center]{Comparación \textcolor{red}{$\dfrac{\text{ciclos totales}}{\text{cant. de píxeles}}$} - diferentes implementaciones de C y ASM}
 \end{figure}
 
-	\begin{figure}[h!]
+\begin{figure}[H]
 	\centering
-	\includegraphics[width = 15 cm, height = 10 cm]{imagenes/PixelarvsCONTROL.png}
-	\caption[center]{Comparación $\dfrac{\text{ciclos totales}}{\text{cant. de píxeles}}$ - diferentes implementaciones de C y ASM}
+	\includegraphics[width = 10 cm, height = 6.5 cm]{imagenes/PixelarvsCONTROL.png}
+	\caption[center]{Comparación \textcolor{red}{$\dfrac{\text{ciclos totales}}{\text{cant. de píxeles}}$} - diferentes implementaciones de C y ASM}
 \end{figure}
 
 \subsection{Experimentación 2}
@@ -96,9 +96,11 @@
 \par{Nuestra idea es que va a ser mucho más eficiente el código donde utilizamos las intrucciones de shift para dividir los números porque son operaciones básicas que se encarga el registro de hacerlas, en cambio \textcolor{red}{el pasar a float, dividir luego y volver a pasar a float}, son todas operaciones sin implementación primitiva (por esto nos referimos a que están compuestas de varias otras instrucciones) y esto da lugar a que la ejecución de cada una demore varios ciclos más que un simple shift.}
 
 \subsubsection{Resultados}
-	\begin{figure}[!h]
-	\includegraphics[width = 15 cm, height = 10 cm]{imagenes/Div_pixelar.png}
-	\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 10 cm, height = 6 cm]{imagenes/Div_pixelar.png}
+	\caption[center]{}
+\end{figure}
 	
 \subsubsection{Conclusión}
 \par{Definitivamente el código en el cual dividimos con shifts fue mucho más eficiente por lo ya explicado en la hipótesis.}
