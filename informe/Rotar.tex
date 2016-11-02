@@ -50,14 +50,15 @@ Luego se guarda en memoria en la imagen destino, se incrementa el contador en 4 
 \par{La hipótesis que tuvimos sobre la primera idea era que efectivamente íbamos a notar un cambio ya que íbamos a estar procesando la mitad de píxeles por iteración. También suponíamos que iba a ser más complicado manipular los píxeles al no contar con instrucciones como \textbf{shuffle}, \textbf{unpacked}, \textbf{psrlx} y \textbf{psllx}.}
 	
 \subsubsection{Resultados}
-\par{Efectivamente vimos una notoria diferencia entre el código en ASM con y sin SIMD, más aún, el código optimizado de C se encuentra casi a la par. \textcolor{red}{EXPLICACION DEL CODIGO SIN SIMD!!!!}}
+\par{Efectivamente vimos una notoria diferencia entre el código en ASM con y sin SIMD.
+Para la implementación del filtro "sin SIMD" utilizamos intrucciones de enteros y manipulamos cada pixel por separado, de esta manera nos aseguramos ya que esta implementación sea 4 veces menos eficaz. Para esto implementamos dos códigos distintos, uno cargaba de a dos píxeles, procesaba sus atributos por separado, guardaba la información en un registro de 64 bits y luego escribía a memoria. El otro cargaba cada atributo por separado, es decir leíamos de a byte y luego escribíamos de a byte. Ambos son menos eficientes que el código con instrucciones SSE, pero no se vieron  cambios significantes en el tiempo de ejecución de ambos al compararlos entre sí. En el gráfico a continuación se compra con la primera implementación explicada, que es ligeramente mejor que la segunda. En particular ambas son entre 6 y 7 veces menos eficaces que el código con SIMD aproximadamente. Atribuímos esto a que no sólo se procesa de a menos píxeles sino que también se lee de esta manera, lo que influye aún más en el tiempo de ejecución.}
 \par{A continuación adjuntamos un gráfico en el que se puede apreciar dicha diferencia.}
 	
 \begin{figure}[H]
 \centering
 \captionsetup{justification=centering}
 	\includegraphics[width = 12 cm, height = 8 cm]{imagenes/RotarSinSIMD.png}
-\caption[center]{Gráfico que compara las velocidad de las ejecuciones de las implementaciones con y sin el uso de instrucciones SSE, y también con optimizaciones de la implementación en C.}
+\caption[center]{Gráfico que compara el tiempo de ejecución de las implementaciones con y sin el uso de instrucciones SSE, y también con optimizaciones de la implementación en C.}
 \end{figure}
 
 \par{A continuación mostramos un gráfico (armado de igual manera que el anterior) donde mostramos los tiempos de ejecución del filtro implementado en ASM y en C con distintas optimizaciones.}
