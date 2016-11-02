@@ -47,13 +47,13 @@ rotar_asm:
 		mov r8b, [r12]
 		shr r12, 8
 		
-		mov r13, r10b
+		mov r13b, r10b
 		shl r13, 8
-		or r13, r8b
+		or r13b, r8b
 		shl r13, 8
-		or r13, r9b
+		or r13b, r9b
 		shl r13, 8
-		or r13, r11b
+		or r13b, r11b
 		
 		mov r11b, [r12] ; subo a r11b un byte
 		shr r12, 8
@@ -63,13 +63,13 @@ rotar_asm:
 		shr r12, 8
 		mov r8b, [r12]
 		
-		mov r14, r10b
+		mov r14b, r10b
 		shl r14, 8
-		or r14, r8b
+		or r14b, r8b
 		shl r14, 8
-		or r14, r9b
+		or r14b, r9b
 		shl r14, 8
-		or r14, r11b
+		or r14b, r11b
 		
 		shl r14, 32
 		or r14, r13
