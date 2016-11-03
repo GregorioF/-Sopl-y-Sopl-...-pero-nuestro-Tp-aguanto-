@@ -59,18 +59,19 @@
 \par{Nuestra implementación de ASM consiste en un ciclo que itera sobre las filas, por ende tuvimos la idea de experimentar sobre eso. Es decir, la cantidad de filas es un factor clave que influye bastante en la cantidad de ciclos de ejecución del filtro. Entonces nuestro experimento se basó en analizar los distintos tiempos de ejecución de imágenes con igual cantidad de píxeles totales, pero con distinto ancho y largo.}
 
 \subsubsection{Hipótesis}
-\par{Al comparar dos imágenes donde el ancho de una es la altura de la otra y viceversa, la aplicación del filtro a la imagen con menor altura tomaría menos ciclos. Cuanto más cercanos sean los valores de altura y ancho, menos varía la cantidad de ciclos.}
-	
-\subsubsection{Resultados}
-\par{Efectivamente eso es lo que podemos observar en el siguiente gráfico. La cantidad de ciclos varía más en las imágenes de 200x1600 y 1600x200, donde podemos observar una diferencia de más de 4 millones de ciclos. En cambio en el par de imágenes de 640x500 y 500x640 la diferencia es de tan solo 155000 ciclos. Estos experimentos se realizaron con la misma imagen rotada y sin rotar, aunque en el caso de este filtro, las cualidades de los píxeles no modifican los resultados.}
+\par{En la primer entrega al comparar dos imágenes donde el ancho de una es la altura de la otra y viceversa, la aplicación del filtro a la imagen con menor altura nos tomó menos ciclos. En este caso quisimos ver que esto se daba porque se procesaban disntintas cantidades de píxeles; pero al experimentar llegamos a la conclusión de que no era asì, en cada imagen se pocesan 80000 píxeles al aplicar el filtro. Por ende conseguimos estos resultados que exhibimos a continuación. }
 
 \begin{figure}[H]
 \centering
 \captionsetup{justification=centering}
 \includegraphics[width = 15 cm, height = 10 cm]{imagenes/distintostamanos.png}
-\caption[center]{Gráfico de barras que da cuenta de los ciclos que implica cada corrida del filtro para imágenes de distintos tamaños con una determinada cantidad fija de píxeles.}
+\caption[center]{Gráfico de barras que da cuenta de los ticks que implica el procesamiento de cada píxel.}
 \end{figure}
 	
+	
+\subsubsection{Resultados}
+\par{En la imagen previa podemos ver que la cantidad de ticks por píxel varia según la imagen, lo que contradice nuestra hipotesis y el sentido común. El píxel en sí no influye en el tiempo de procesamiento del mismo, por ende no le encontramos explicación a estos resultados.}
+
 \par{A continuación adjuntamos el gráfico que compara la cantidad de ciclos que tarda en ejecutarse el filtro implementado en ASM y el implementado en C.}
 
 \begin{figure}[h!]
