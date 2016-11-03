@@ -108,7 +108,7 @@ void imprimir_tiempos_ejecucion(unsigned long long int start, unsigned long long
 	printf("  # de ciclos insumidos totales     : %llu\n", cant_ciclos);
 	printf("  # de ciclos insumidos por llamada : %.3f\n", (float)cant_ciclos/(float)cant_iteraciones);
 	*total = *total + cant_ciclos;
-	fprintf(pFile,"%llu\n", cant_ciclos);
+	fprintf(pFile,"%.3f\n", (float)cant_ciclos/(float)cant_iteraciones);
 	fclose( pFile );
 }
 

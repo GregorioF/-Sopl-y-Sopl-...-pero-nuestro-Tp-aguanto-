@@ -186,5 +186,18 @@ se ejecuta la instrucción \textbf{punpcklbw xmm1, xmm9} que da como resultado
 \end{figure}
 
 \par{A simple vista se observa que la implementación de C da como resultado que la mayor parte del tiempo de ejecución esté destinada al procesamiento de la imagen, al contrario de lo que ocurre con la implementación de ASM que resulta en un mayor consumo de ciclos por parte de los accesos a memoria, sobre todo de la lectura.}
-\par{Más aún, el cociente entre los accesos a memoria y el procesamiento de píxeles para la implementación de ASM da 17,52, es decir que cada 37 ciclos, 35 surgen de los accesos y 2 del procesamiento. En cambio, este cociente es 0,34 para la implementación en C, de modo que la diferencia entre ambas implementaciones en cuanto al uso de la memoria y del procesador es muy significativa.}
-\par{\textcolor{red}{Párrafo en referencia a que tarde más en leer que en escribir?}}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{cc}
+\hline
+\multicolumn{1}{|c|}{}       &
+\multicolumn{1}{c|}{$\dfrac{\text{ciclos de accesos a memoria}}{\text{ciclos de procesamiento de píxeles}}$}\\ \hline
+\multicolumn{1}{|c|}{ASM}      &
+\multicolumn{1}{c|}{17,52}\\ \hline
+\multicolumn{1}{|c|}{C}       &
+\multicolumn{1}{c|}{0,34}\\ \hline
+\end{tabular}
+\end{table}
+
+\par{Como se puede ver, la diferencia entre ambas implementaciones en cuanto al uso de la memoria y del procesador es muy significativa.}
