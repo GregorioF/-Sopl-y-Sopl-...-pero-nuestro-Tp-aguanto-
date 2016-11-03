@@ -83,7 +83,7 @@
 \end{figure}
 	\begin{figure}[H]
 	\centering
-	\includegraphics[width = 10 cm, height = 6.5 cm]{imagenes/ASMvsCPixelar.png}
+	\includegraphics[width = 10 cm, height = 7 cm]{imagenes/ASMvsCPixelar.png}
 	\caption[center]{}
 \end{figure}
 
@@ -93,14 +93,14 @@
 \par{Comparamos la eficiencia entre un código que utiliza instrucciones como shift, para dividir los píxeles, contra otro que usa las instrucciones para dividir floats, que implican además tener que hacer un traspaso de formato.}
 
 \subsubsection{Hipótesis}
-\par{Nuestra idea es que va a ser mucho más eficiente el código donde utilizamos las intrucciones de shift para dividir los números porque son operaciones básicas que se encarga el registro de hacerlas, en cambio \textcolor{red}{el pasar a float, dividir luego y volver a pasar a float}, son todas operaciones sin implementación primitiva (por esto nos referimos a que están compuestas de varias otras instrucciones) y esto da lugar a que la ejecución de cada una demore varios ciclos más que un simple shift.}
+\par{Nuestra idea es que va a ser mucho más eficiente el código donde utilizamos las intrucciones de shift para dividir los números porque son operaciones básicas que se encarga el registro de hacerlas, en cambio el pasar a float, dividir luego y volver a pasar a entero, son todas operaciones sin implementación primitiva (por esto nos referimos a que están compuestas de varias otras instrucciones) y esto da lugar a que la ejecución de cada una demore varios ciclos más que un simple shift.}
 
 \subsubsection{Resultados}
 \begin{figure}[H]
 	\centering
-	\includegraphics[width = 10 cm, height = 6 cm]{imagenes/Div_pixelar.png}
+	\includegraphics[width = 11 cm, height = 7 cm]{imagenes/Div_pixelar.png}
 	\caption[center]{}
 \end{figure}
 	
 \subsubsection{Conclusión}
-\par{Definitivamente el código en el cual dividimos con shifts fue mucho más eficiente por lo ya explicado en la hipótesis.}
+\par{Definitivamente el código en el cual dividimos con shifts fue mucho más eficiente por lo previamente dicho.}
