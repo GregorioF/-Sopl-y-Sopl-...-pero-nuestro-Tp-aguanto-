@@ -62,7 +62,7 @@
 \par{Al comparar dos imágenes donde el ancho de una es la altura de la otra y viceversa, la aplicación del filtro a la imagen con menor altura tomaría menos ciclos. Cuanto más cercanos sean los valores de altura y ancho, menos varía la cantidad de ciclos.}
 	
 \subsubsection{Resultados}
-\par{Efectivamente eso es lo que podemos observar en el siguiente gráfico. La cantidad de ciclos varía más en las imágenes de 200x1600 y 1600x200, donde podemos observar una diferencia de más de 4 millones de ciclos. En cambio en el par de imágenes de 640x500 y 500x640 la diferencia es de tan solo \textcolor{red}{1 millón y medio} (exactamente \textcolor{red}{155981} ciclos). Estos experimentos se realizaron con la misma imagen rotada y sin rotar, aunque en el caso de este filtro, las cualidades de los píxeles no modifican los resultados.}
+\par{Efectivamente eso es lo que podemos observar en el siguiente gráfico. La cantidad de ciclos varía más en las imágenes de 200x1600 y 1600x200, donde podemos observar una diferencia de más de 4 millones de ciclos. En cambio en el par de imágenes de 640x500 y 500x640 la diferencia es de tan solo 155000 ciclos. Estos experimentos se realizaron con la misma imagen rotada y sin rotar, aunque en el caso de este filtro, las cualidades de los píxeles no modifican los resultados.}
 
 \begin{figure}[H]
 \centering
@@ -77,5 +77,5 @@
 \centering
 \captionsetup{justification=centering}
 \includegraphics[width = 12 cm, height = 7 cm]{imagenes/ASMvsCSmalltiles.png}
-\caption[center]{Comparación de las implementaciones y compilaciones con distintos niveles de optimización en cuanto a la rapidez para el procesamiento de una imagen.}
+\caption[center]{Comparación de las implementaciones y compilaciones con distintos niveles de optimización en cuanto a su tiempo de ejecución.}
 \end{figure}

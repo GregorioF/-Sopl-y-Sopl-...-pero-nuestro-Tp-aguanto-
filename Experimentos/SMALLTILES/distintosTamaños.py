@@ -71,7 +71,7 @@ for i in range(128):
 
     
 small31 = small31/20
-small31 = small31/160000
+small31 = small31/80000
 
 ind = 0
 small13 = 0
@@ -81,7 +81,7 @@ for i in range(128):
     ind = ind + 1
 
 small13 = small13/20
-small13 = small13/160000
+small13 = small13/80000
 ind = 0
 small21 = 0
 for i in range(128):
@@ -90,7 +90,7 @@ for i in range(128):
     ind = ind + 1
     
 small21 = small21/20
-small21 = small21/160000
+small21 = small21/80000
 ind = 0
 small12 = 0
 for i in range(128):
@@ -99,7 +99,7 @@ for i in range(128):
     ind = ind + 1
     
 small12 = small12/ind
-small12 = small12/160000
+small12 = small12/80000
 ind = 0
 small65 = 0
 for i in range(128):
@@ -108,7 +108,7 @@ for i in range(128):
     ind = ind + 1
     
 small65 = small65/20
-small65 = small65/160000
+small65 = small65/80000
 ind = 0
 small56 = 0
 for i in range(128):
@@ -117,7 +117,7 @@ for i in range(128):
     ind = ind + 1
     
 small56 = small56/20
-small56 = small56/160000
+small56 = small56/80000
 
 
 y = []
@@ -131,6 +131,6 @@ y.append(small21)
 x = [1,2,3,4,5,6]
 
 plt.plot(x,y,'ro')
-
+plt.ylabel('Ticks')
 plt.show()
 

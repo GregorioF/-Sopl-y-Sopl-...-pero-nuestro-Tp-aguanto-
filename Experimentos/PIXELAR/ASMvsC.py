@@ -98,9 +98,7 @@ ax.set_xticklabels(('ASM', 'O3:CONTROL'))
 plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
 
 
-print(c)
-print(o3)
-print((c*100)/o3)
+print(np.std(asmA))
 
 plt.text(1.25, 2367954, r'%100')
 plt.text(0.25, 610000, r'%25')
