@@ -89,7 +89,7 @@ width = .75
 fig, ax = plt.subplots()
 rects1 = ax.bar(ind, y, width, yerr=stdd)
 
-ax.set_ylabel('Ciclos')
+ax.set_ylabel('Ticks')
 ax.set_title('       Diferencias entre Combinar ASM y Combinar C')
 #ax.set_subtitle(' formas e igual cantidad de pixeles')
 ax.set_xticks(ind + 0.4)
@@ -102,7 +102,7 @@ plt.text(0.17, 50000000, 'O0 : %141',
 rects1[0].set_color('y')
 rects1[1].set_color('m')
 
-plt.grid(False)
+plt.grid(linestyle = 'dotted')
 
 #plt.ylim(0,35000000)
 

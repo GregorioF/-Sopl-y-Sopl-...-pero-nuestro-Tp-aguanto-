@@ -73,15 +73,16 @@ o3 = o3/ind
  
 stdd = []
 stdd.append(np.std(asmA))
-stdd.append(np.std(cA))
+
+#stdd.append(np.std(cA))
 #stdd.append(np.std(o2A))
-#stdd.append(np.std(o3A))
+stdd.append(np.std(o3A))
 
 y = []
 y.append(asm)
-y.append(c)
+#y.append(c)
 #y.append(o2)
-#y.append(o3)
+y.append(o3)
 
 ind = np.arange(2) 
 width = .5     
@@ -89,18 +90,23 @@ width = .5
 fig, ax = plt.subplots()
 rects1 = ax.bar(ind, y, width, yerr = stdd)
 
-ax.set_ylabel('Ciclos')
+ax.set_ylabel('Ticks')
 ax.set_title('       Pixelar ASM y Pixelar C')
 #ax.set_subtitle(' formas e igual cantidad de pixeles')
 ax.set_xticks(ind + 0.4)
-ax.set_xticklabels(('ASM', 'C'))
+ax.set_xticklabels(('ASM', 'O3:CONTROL'))
 plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
 
 
 print(c)
-plt.text(1.25, 20000000, r'%100')
+print(o3)
+print((c*100)/o3)
 
-plt.text(0.25, 610000, r'%3')
+plt.text(1.25, 2367954, r'%100')
+plt.text(0.25, 610000, r'%25')
+plt.text(0.17, 2000000, 'O0 : %879',
+        bbox={'facecolor':'white', 'alpha':0.5, 'pad':10})
+
 
 
 rects1[0].set_color('r')
@@ -108,7 +114,7 @@ rects1[1].set_color('y')
 
 
 
-plt.grid(False)
+plt.grid(linestyle = 'dotted')
 
 #plt.ylim(30000,26000000)
 

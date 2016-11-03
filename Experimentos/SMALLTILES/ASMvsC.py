@@ -125,7 +125,7 @@ width = .75
 fig, ax = plt.subplots()
 rects1 = ax.bar(ind, y, width, yerr = stdd)
 
-ax.set_ylabel('Ciclos')
+ax.set_ylabel('Ticks')
 ax.set_title('       Diferencias entre Smalltiles ASM y Smalltiles C')
 #ax.set_subtitle(' formas e igual cantidad de pixeles')
 ax.set_xticks(ind + 0.4)

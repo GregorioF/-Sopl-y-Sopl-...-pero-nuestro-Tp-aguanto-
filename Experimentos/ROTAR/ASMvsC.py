@@ -96,8 +96,8 @@ width = .75
 fig, ax = plt.subplots()
 rects1 = ax.bar(ind, y, width, yerr = stdd)
 
-ax.set_ylabel('Ciclos')
-ax.set_title('Comparacion de cantidad de ciclos entre ASM y distintas optimizaciones de C')
+ax.set_ylabel('Ticks')
+ax.set_title('Comparacion ASM vs distintas optimizaciones de C')
 #plt.suptitle('de Rotar ASM y Rotar C', y=1.05, fontsize=17)
 ax.set_xticks(ind + 0.4)
 ax.set_xticklabels(('ASM','C','O3:CONTROL'))
@@ -110,12 +110,6 @@ plt.text(0.25, 550000, r'%8')
 plt.text(2.25, 4763388, r'%100' )
 plt.text(1.25, 15000000, r'%305')
 
-print(rotar)
-print(rotar2)
-print(o3)
-
-print((rotar*100)/o3)
-print((rotar2*100)/o3)
 
 plt.show()
 
