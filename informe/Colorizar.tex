@@ -126,14 +126,14 @@ Vamos a utilizar para esto los registros xmm1, y xmm2
 \subsubsection{Conclusión}
 \par{La conclusión que podemos sacar de estos resultados es que, en primer lugar, como dijimos en la hipótesis, que se terminó corroborando, el código en C sin optimizar fue por lejos más lento que los otros dos. Y el código en C optimizado por más que mejoró muchísimo con respecto al anterior, siguió siendo más lento que el código en ASM.}
 \par{Luego podemos ver que no nos confundimos tampoco en el momento de cambiar los tamaño de las imágenes pues los valores se mantuvieron casi constantes, justamente porque no se cambia la cantidad de operaciones que se hace respecto a las dimensiones de las imágenes, siempre se mantiene según la cantidad de píxeles.}
-\par{Por último, nos llamó la atención el experimento de correr los códigos con imágenes de un solo color. Lo que pasó acá de extraño fue que las performance de los códigos en ASM y en C -O3 se mantuvieron iguales a los desarrollados con imágenes comunes, sin embargo el código en C -O0 demostró una gran mejora respecto a su performance, de la cual no podemos explicar precisamente el por qué, y de hecho esto también se ve en la primera imagen, donde para las imágenes de 4096x4096 el código en C -O0 mostró que mejoraba su rendimiento. Creemos que esto se debe a que justamente las imágenes que le pasamos tienen grandes secciones con píxeles del mismo color, porque son expansiones de una imagen de 512x512. Y se genera en estos fragmentos esta optimización que no podemos explicar sobre C -O0 en imágenes donde el color no cambia.}
+\par{Por último, nos llamó la atención el experimento de correr los códigos con imágenes de un solo color. Lo que pasó acá de extraño fue que las performance de los códigos en ASM y en C -O3 se mantuvieron iguales a los desarrollados con imágenes comunes, sin embargo el código en C -O0 demostró una gran mejora respecto a su performance, y de hecho esto también se ve en la primera imagen, donde para las imágenes de 4096x4096 el código en C -O0 mostró que mejoraba su rendimiento. Creemos que esto se debe a que justamente las imágenes que le pasamos tienen grandes secciones con píxeles del mismo color, porque son expansiones de una imagen de 512x512. Asumimos que esta optimización es generada por el procesador, que corrige los errores en la toma de decisiones cuando esta es la misma constantemente. Y como el código en C -O0 tiene una duración significativamente mayor que los otros dos, se da más lugar a notar esta optimización.}
 	
 
 \subsection{Experimentación 2}	
 
 \subsubsection{Idea}
 \par{El segundo experimento es un experimento más destructivo. Vamos a intentar molestar al jump predictor y ver cómo influye eso en la  performance del programa.}
-\par{El experimento en sí trata de agarrar un número arbitrario desde los datos de entrada y en diferentes puntos de parada, ejecutar un control de flujo if then else, tal que dependiendo de \textcolor{red}{ciertas condiciones random de este número arbitrario}, salte a diferentes secciones del código. Todo esto dispuesto de tal manera que sea transparente a la ejecución final del programa, es decir, si el código sigue el camino del if no cambia a si sigue el camino del else.}
+\par{El experimento en sí trata de agarrar un número arbitrario desde los datos de entrada y en diferentes puntos de parada, ejecutar un control de flujo if then else, tal que dependiendo de ciertas condiciones de este número random, salte a diferentes secciones del código. Todo esto dispuesto de tal manera que sea transparente a la ejecución final del programa, es decir, si el código sigue el camino del if no cambia a si sigue el camino del else.}
 
 \subsubsection{Hipótesis}
 \par{Nuestra hipótesis es que justamente el código no modificado va a ser bastante mejor que el código desarrollado con molestias para el jump predictor, porque en caso de funcionar estas, en cada ciclo estaríamos haciendo que flushee el pipeline, y que pierda muchos ciclos de clock extra.}
@@ -144,13 +144,13 @@ Vamos a utilizar para esto los registros xmm1, y xmm2
 \centering
 \captionsetup{justification=centering}
 	\includegraphics[width = 15 cm, height = 8 cm]{imagenes/JumpPredictor.jpg}
-	\caption[center]{Comparación ASM comun vs ASM molestando Jump Predictor}
+	\caption[center]{Comparación ASM común vs ASM molestando Jump Predictor}
 \end{figure}
 
 \medskip
 
 \subsubsection{Conclusión}
-\par{Efectivamente los resultados fueron los esperados, por lo que nos llevamos como conclusión del experimento que influye mucho la arbitrariedad del flujo del \textcolor{red}{programa que se arma}. Si uno lo hace muy \textcolor{red}{aleatorio} como en este caso, por más que no afecte a la complejidad total el programa tarda significativamente más.}
+\par{Efectivamente los resultados fueron los esperados, por lo que nos llevamos como conclusión del experimento que influye mucho el flujo del programa que se efectúa. Si uno hace los controles de flujo de índole aleatoria, como en este caso, por más que no afecte a la complejidad total el programa tarda significativamente más.}
 
 \subsection{Experimentación 3}
 

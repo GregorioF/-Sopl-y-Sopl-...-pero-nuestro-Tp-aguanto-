@@ -73,18 +73,21 @@
 \subsection{Experimentación 1}
 
 \subsubsection{Idea}	
-\par{Comparamos la eficiencia del código en ASM, \textcolor{red}{el de C y el de C optimizado}.}
+\par{Comparamos la eficiencia del código en ASM, el de C y el de C optimizado.}
 	
 \subsubsection{Resultados}
 	\begin{figure}[H]
 	\centering
+	\captionsetup{justification=centering}
 	\includegraphics[width = 15 cm, height = 10 cm]{imagenes/pixeAsmC.jpg}
-	\caption[center]{Comparación \textcolor{red}{$\dfrac{\text{ticks totales}}{\text{cant. de píxeles}}$} - diferentes implementaciones de C y ASM}
+	\caption[center]{Comparación $\dfrac{\text{ticks totales}}{\text{cant. de píxeles}}$ - diferentes implementaciones de C y ASM para distintos tamaños de imágenes.}
 \end{figure}
-	\begin{figure}[H]
+
+\begin{figure}[H]
 	\centering
-	\includegraphics[width = 10 cm, height = 7 cm]{imagenes/ASMvsCPixelar.png}
-	\caption[center]{}
+	\captionsetup{justification=centering}
+	\includegraphics[width = 10 cm, height = 6.5 cm]{imagenes/ASMvsCPixelar.png}
+	\caption[center]{Comparación de los ticks de reloj para implementaciones de C y ASM para un mismo tamaño de imagen.}
 \end{figure}
 
 
@@ -98,8 +101,9 @@
 \subsubsection{Resultados}
 \begin{figure}[H]
 	\centering
-	\includegraphics[width = 11 cm, height = 7 cm]{imagenes/Div_pixelar.png}
-	\caption[center]{}
+	\captionsetup{justification=centering}
+	\includegraphics[width = 11 cm, height = 6.5 cm]{imagenes/Div_pixelar.png}
+	\caption[center]{Ticks para las implementaciones haciendo las divisiones con shifts o con el div de floats.}
 \end{figure}
 	
 \subsubsection{Conclusión}
